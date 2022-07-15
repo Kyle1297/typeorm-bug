@@ -2,13 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
-  id: Float!
+type SocialProvider {
+  id: ID!
   provider: String!
-  providerId: String!
-  username: String!
-  name: String!
-  orders: [Order]!
+  socialId: String!
+  user: User!
   created_at: DateTime!
   updated_at: DateTime!
 }
@@ -17,6 +15,15 @@ type User {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  socialProviders: [SocialProvider!]!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
 
 type Order {
   id: Float!

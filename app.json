@@ -19,21 +19,6 @@
     },
     "OAUTH_GOOGLE_REDIRECT_URL": {
       "value": "dummy"
-    },
-    "OAUTH_COGNITO_ID": {
-      "value": "dummy"
-    },
-    "OAUTH_COGNITO_SECRET": {
-      "value": "dummy"
-    },
-    "OAUTH_COGNITO_REDIRECT_URL": {
-      "value": "dummy"
-    },
-    "OAUTH_COGNITO_DOMAIN": {
-      "value": "dummy"
-    },
-    "OAUTH_COGNITO_REGION": {
-      "value": "us-east-1"
     }
   },
   "addons": [

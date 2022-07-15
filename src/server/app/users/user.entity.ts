@@ -1,49 +1,91 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  BeforeInsert,
 } from 'typeorm';
-import { ObjectType, Field } from '@nestjs/graphql';
-import { Provider } from 'src/server/common/types/user';
-import { Order } from '../orders/order.entity';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
+import * as uuid from 'uuid-with-v6';
+import {
+  IsEmail,
+  IsISO31661Alpha2,
+  IsPhoneNumber,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+import * as bcrypt from 'bcryptjs';
+
+import { SocialProvider } from '../auth/auth.entity';
 
 @ObjectType()
 @Entity()
 export class User {
-  @Field()
-  @PrimaryGeneratedColumn()
-  id: number;
+  @Field((_type) => ID)
+  @PrimaryColumn('uuid')
+  id: string;
 
   @Field()
+  @IsEmail()
+  @Column({ unique: true, nullable: false })
+  email: string;
+
+  @Field()
+  @MinLength(8)
+  @Column({ nullable: true })
+  password: string;
+
+  @Field()
+  @MaxLength(255)
   @Column({ nullable: false })
-  provider: Provider;
+  firstName: string;
 
   @Field()
+  @MaxLength(255)
   @Column({ nullable: false })
-  providerId: string;
+  lastName: string;
 
   @Field()
+  @IsISO31661Alpha2()
   @Column({ nullable: false })
-  username: string;
+  phoneCountryCode: string;
 
   @Field()
+  @IsPhoneNumber()
   @Column({ nullable: false })
-  name?: string;
+  phoneNumber: string;
 
-  @Field((_type) => [Order], { nullable: 'items' })
-  @OneToMany((_type) => Order, (order) => order.user)
-  orders?: Order[];
+  @Field((_type) => [SocialProvider])
+  @OneToMany(
+    (_type) => SocialProvider,
+    (socialProvider) => socialProvider.user,
+    {
+      nullable: true,
+    },
+  )
+  socialProviders: SocialProvider[];
 
   @Field()
-  @Column()
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @Field()
-  @Column()
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
+
+  @BeforeInsert()
+  setIdAsUuid() {
+    this.id = uuid.v6();
+  }
+
+  @BeforeInsert()
+  async hashPassword() {
+    if (this.password) this.password = await bcrypt.hash(this.password, 10);
+  }
+
+  async comparePassword(password: string) {
+    return bcrypt.compare(password, this.password);
+  }
 }

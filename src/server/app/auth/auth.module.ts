@@ -1,19 +1,45 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from '../users/users.module';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { GoogleOauthModule } from './google/google-oauth.module';
-import { JwtAuthModule } from './jwt/jwt-auth.module';
-import { AuthController } from './auth.controller';
-import { CognitoOauthModule } from './cognito/cognito-oauth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './strategy/jwt.strategy';
+import { GoogleStrategy } from './strategy/google.strategy';
+import { FacebookStrategy } from './strategy/facebook.strategy';
+import { AuthService } from './auth.service';
+import { AuthResolver } from './auth.resolver';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { SocialProviderRepository } from './auth.repository';
+import jwtConfig from 'src/server/config/jwt.config';
+import googleConfig from 'src/server/config/google.config';
+import facebookConfig from 'src/server/config/facebook.config';
+import { UserModule } from '../users/user.module';
 
 @Module({
-  controllers: [AuthController],
   imports: [
-    UsersModule,
-    PassportModule,
-    GoogleOauthModule,
-    JwtAuthModule,
-    CognitoOauthModule,
+    ConfigModule.forFeature(jwtConfig),
+    ConfigModule.forFeature(googleConfig),
+    ConfigModule.forFeature(facebookConfig),
+    TypeOrmModule.forFeature([SocialProviderRepository]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('jwt.secret'),
+        signInOptions: {
+          expiresIn: configService.get('jwt.expiresIn'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    UserModule,
   ],
+  providers: [
+    AuthResolver,
+    AuthService,
+    JwtStrategy,
+    GoogleStrategy,
+    FacebookStrategy,
+  ],
+  exports: [],
 })
 export class AuthModule {}
