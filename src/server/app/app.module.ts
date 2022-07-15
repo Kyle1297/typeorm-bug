@@ -4,8 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConsoleModule } from 'nestjs-console';
 import { ConfigModule } from '@nestjs/config';
 import { SeedService } from 'src/server/console/seed.service';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/user.module';
 import { GraphqlConfigService } from '../config/graphql.config';
@@ -28,7 +26,6 @@ import { TypeOrmConfigService } from '../config/typeorm.config';
     UserModule,
     AuthModule,
   ],
-  providers: [SeedService, AppService],
-  controllers: [AppController],
+  providers: [SeedService],
 })
 export class AppModule {}

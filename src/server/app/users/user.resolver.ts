@@ -2,7 +2,7 @@ import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './user.entity';
 import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/server/common/guards/jwt-auth.guard';
+import { JwtGqlAuthGuard } from 'src/server/common/guards/jwt-gql-auth.guard';
 import { GqlUser } from 'src/server/common/decorators/gql-user.decorator';
 
 @Resolver()
@@ -20,13 +20,13 @@ export class UserResolver {
   }
 
   @Query((_returns) => User)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtGqlAuthGuard)
   async me(@GqlUser() user: User): Promise<User> {
     return user;
   }
 
   @Mutation((_returns) => User)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtGqlAuthGuard)
   async removeUser(
     @Args({ name: 'id', type: () => ID }) id: string,
   ): Promise<User> {
