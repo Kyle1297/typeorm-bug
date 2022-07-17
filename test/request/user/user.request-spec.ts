@@ -4,7 +4,8 @@ import { gql } from 'apollo-server-express';
 import { GQL } from '../constants';
 import { authHeaderFactory } from '../../factories/auth.factory';
 import { E2EApp, initializeApp } from '../test-utils/initialize-app';
-import * as faker from 'faker';
+import { addressFactory } from 'test/factories/address.factory';
+import { User } from 'src/server/app/users/user.entity';
 
 describe('UserModule (e2e)', () => {
   let e2e: E2EApp;
@@ -17,59 +18,65 @@ describe('UserModule (e2e)', () => {
     await e2e.cleanup();
   });
 
-  describe('users query', () => {
+  describe('currentUser query', () => {
     const query = gql`
-      query {
-        users {
+      query currentUser {
+        currentUser {
           id
           email
+          firstName
+          lastName
+          phoneCountryCode
+          phoneNumber
+          addresses {
+            id
+          }
+          createdAt
+          updatedAt
         }
       }
     `.loc?.source.body;
 
-    it('should return users', async () => {
-      const users = await e2e.dbTestUtils.saveMany([
-        userFactory.buildOne({
-          email: faker.internet.email(),
-          id: faker.datatype.uuid(),
-        }),
-        userFactory.buildOne({
-          email: faker.internet.email(),
-          id: faker.datatype.uuid(),
-        }),
-      ]);
-
-      const gqlReg = {
-        query,
-      };
-
-      const result = await request(e2e.app.getHttpServer())
-        .post(GQL)
-        .send(gqlReg)
-        .expect(200);
-
-      expect(result.body.data.users.length).toBe(users.length);
-    });
-  });
-
-  describe('user query', () => {
-    const query = gql`
-      query user($email: String!) {
-        user(email: $email) {
-          id
-          email
-        }
-      }
-    `.loc?.source.body;
-
-    it('should return user with given email', async () => {
+    it('should return current user', async () => {
       const user = await e2e.dbTestUtils.saveOne(userFactory.buildOne());
+      const address = await e2e.dbTestUtils.saveOne(
+        addressFactory.buildOne({
+          entityId: user.id,
+          entityType: User.name,
+          type: 'PICKUP_AND_DELIVERY',
+          instructions: 'LEAVE_AT_DOOR',
+        }),
+      );
 
       const gqlReg = {
         query,
-        variables: {
-          email: user.email,
-        },
+      };
+
+      const result = await request(e2e.app.getHttpServer())
+        .post(GQL)
+        .send(gqlReg)
+        .set('Authorization', authHeaderFactory(user))
+        .expect(200);
+
+      expect(result.body.data.currentUser.email).toBe(user.email);
+      expect(result.body.data.currentUser.firstName).toBe(user.firstName);
+      expect(result.body.data.currentUser.lastName).toBe(user.lastName);
+      expect(result.body.data.currentUser.phoneCountryCode).toBe(
+        user.phoneCountryCode,
+      );
+      expect(result.body.data.currentUser.phoneNumber).toBe(user.phoneNumber);
+      expect(result.body.data.currentUser.addresses[0].id).toBe(address.id);
+      expect(result.body.data.currentUser.createdAt).toBe(
+        user.createdAt.toISOString(),
+      );
+      expect(result.body.data.currentUser.updatedAt).toBe(
+        user.updatedAt.toISOString(),
+      );
+    });
+
+    it('should reject if user is not authenticated', async () => {
+      const gqlReg = {
+        query,
       };
 
       const result = await request(e2e.app.getHttpServer())
@@ -77,27 +84,25 @@ describe('UserModule (e2e)', () => {
         .send(gqlReg)
         .expect(200);
 
-      expect(result.body.data.user.email).toBe(user.email);
+      expect(result.body.errors).toHaveLength(1);
+      expect(result.body.errors[0].message).toBe('Unauthorized');
     });
   });
 
-  describe('removeUser mutation', () => {
+  describe('removeCurrentUser mutation', () => {
     const query = gql`
-      mutation remove($input: ID!) {
-        removeUser(id: $input) {
+      mutation removeCurrentUser {
+        removeCurrentUser {
           email
         }
       }
     `.loc?.source.body;
 
-    it('should remove user, and return removed user', async () => {
+    it('should remove current user, and return removed user', async () => {
       const user = await e2e.dbTestUtils.saveOne(userFactory.buildOne());
 
       const gqlReq = {
         query,
-        variables: {
-          input: user.id,
-        },
       };
 
       const result = await request(e2e.app.getHttpServer())
@@ -106,7 +111,21 @@ describe('UserModule (e2e)', () => {
         .set('Authorization', authHeaderFactory(user))
         .expect(200);
 
-      expect(result.body.data.removeUser.email).toBe(user.email);
+      expect(result.body.data.removeCurrentUser.email).toBe(user.email);
+    });
+
+    it('should reject if user is not authenticated', async () => {
+      const gqlReg = {
+        query,
+      };
+
+      const result = await request(e2e.app.getHttpServer())
+        .post(GQL)
+        .send(gqlReg)
+        .expect(200);
+
+      expect(result.body.errors).toHaveLength(1);
+      expect(result.body.errors[0].message).toBe('Unauthorized');
     });
   });
 });

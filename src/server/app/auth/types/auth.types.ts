@@ -1,6 +1,3 @@
-import { SocialProviderTypes } from '../auth.entity';
+import { SocialProviderTypes } from '../scalars/SocialProviderScalar';
 
-export const AuthTypes = {
-  ...SocialProviderTypes,
-  JWT: 'jwt',
-};
+export type AuthTypes = SocialProviderTypes | 'jwt';

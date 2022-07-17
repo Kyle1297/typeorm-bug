@@ -33,21 +33,12 @@ describe('UserService', () => {
     });
   });
 
-  describe('findAll', () => {
-    it('should return all users', async () => {
-      const users = userFactory.buildMany(2);
-      jest.spyOn(userRepository, 'find').mockResolvedValueOnce(users);
-
-      const result = await userService.findAll();
-
-      expect(result).toBe(users);
-    });
-  });
-
   describe('findOneByEmail', () => {
     it('should return user with given email', async () => {
       const user = userFactory.buildOne();
-      jest.spyOn(userRepository, 'findOneOrFail').mockResolvedValueOnce(user);
+      jest
+        .spyOn(userRepository, 'findOneAndAllAddressesByEmail')
+        .mockResolvedValueOnce(user);
 
       const result = await userService.findOneByEmail(user.email);
 
@@ -60,7 +51,7 @@ describe('UserService', () => {
       const { id: socialId } = socialProfileFactory.buildOne();
       const user = userFactory.buildOne();
       jest
-        .spyOn(userRepository, 'findOneBySocialId')
+        .spyOn(userRepository, 'findOneAndAllAddressesBySocialId')
         .mockResolvedValueOnce(user);
 
       const result = await userService.findOneBySocialId(socialId);
@@ -75,7 +66,7 @@ describe('UserService', () => {
       jest.spyOn(userRepository, 'findOneOrFail').mockResolvedValueOnce(user);
       jest.spyOn(userRepository, 'remove').mockResolvedValueOnce(user);
 
-      const result = await userService.remove(user.id);
+      const result = await userService.remove(user);
 
       expect(result).toBe(user);
     });

@@ -1,12 +1,15 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { ErrorResponse } from '../../graphql/interfaces/error-response.interface';
-import { SocialProviderTypes } from '../auth.entity';
+import {
+  SocialProviderScalar,
+  SocialProviderTypes,
+} from '../scalars/SocialProviderScalar';
 
 @ObjectType({
   implements: [ErrorResponse],
 })
 export class SocialAlreadyAssignedError extends ErrorResponse {
-  @Field((_type) => SocialProviderTypes)
+  @Field((_type) => SocialProviderScalar)
   provider: SocialProviderTypes;
 
   constructor(partial?: Partial<SocialAlreadyAssignedError>) {

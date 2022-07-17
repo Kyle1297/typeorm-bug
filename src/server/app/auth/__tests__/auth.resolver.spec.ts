@@ -176,7 +176,7 @@ describe('AuthResolver', () => {
       jest.spyOn(authService, 'registerSocial').mockResolvedValueOnce(
         either.error(
           new CredentialsTakenError({
-            providedEmail: registerSocialInput.email,
+            providedEmail: profile.emails[0].value,
           }),
         ),
       );
@@ -187,7 +187,7 @@ describe('AuthResolver', () => {
       )) as [CredentialsTakenError];
 
       expect(result).toBeInstanceOf(CredentialsTakenError);
-      expect(result.providedEmail).toBe(registerSocialInput.email);
+      expect(result.providedEmail).toBe(profile.emails[0].value);
     });
 
     it('should handle SocialAlreadyAssigned errors correctly', async () => {

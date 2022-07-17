@@ -15,14 +15,8 @@ export const registerUserInputFactory = FactoryBuilder.of(RegisterUserInput)
   .props({
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
-    phoneCountryCode: faker.address.countryCode(),
-    phoneNumber: faker.phone.phoneNumber(
-      faker.random.arrayElement([
-        '+61 ### ### ###',
-        '+48 91 ### ## ##',
-        '+1 ### ### ####',
-      ]),
-    ),
+    phoneCountryCode: 'AU',
+    phoneNumber: faker.phone.phoneNumber('+61 4## ### ###'),
   })
   .mixins([loginUserInputFactory])
   .build();
@@ -30,6 +24,8 @@ export const registerUserInputFactory = FactoryBuilder.of(RegisterUserInput)
 export const userFactory = FactoryBuilder.of(User)
   .props({
     id: faker.datatype.uuid(),
+    socialProviders: [],
+    addresses: [],
   })
   .mixins([registerUserInputFactory])
   .build();

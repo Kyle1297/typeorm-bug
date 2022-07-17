@@ -7,8 +7,8 @@ import { SeedService } from 'src/server/console/seed.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/user.module';
 import { GraphqlConfigService } from '../config/graphql.config';
-import { envSchema } from '../config/env.schema';
 import { TypeOrmConfigService } from '../config/typeorm.config';
+import { AddressModule } from './addresses/address.module';
 
 @Module({
   imports: [
@@ -17,7 +17,6 @@ import { TypeOrmConfigService } from '../config/typeorm.config';
     }),
     ConfigModule.forRoot({
       ignoreEnvFile: !!process.env.CI,
-      validationSchema: envSchema,
     }),
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
@@ -25,6 +24,7 @@ import { TypeOrmConfigService } from '../config/typeorm.config';
     ConsoleModule,
     UserModule,
     AuthModule,
+    AddressModule,
   ],
   providers: [SeedService],
 })

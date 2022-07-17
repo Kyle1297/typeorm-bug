@@ -3,7 +3,6 @@ import { AuthService } from '../auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { SocialProviderRepository } from '../auth.repository';
 import { CredentialsTakenError } from '../responses/credentials-taken.error';
-import { SocialProviderTypes } from '../auth.entity';
 import { SocialAlreadyAssignedError } from '../responses/social-already-assigned.error';
 import { UserService } from '../../users/user.service';
 import { UserRepository } from '../../users/user.repository';
@@ -106,7 +105,7 @@ describe.only('AuthService', () => {
   });
 
   describe('loginSocial', () => {
-    const provider = SocialProviderTypes.FACEBOOK;
+    const provider = 'facebook';
 
     it('should return found user', async () => {
       const profile = socialProfileFactory.buildOne();

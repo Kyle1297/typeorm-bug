@@ -11,20 +11,15 @@ export class UserService {
     return this.usersRepository.save(preparedUser);
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
-  }
-
   findOneByEmail(email: string): Promise<User> {
-    return this.usersRepository.findOneOrFail({ email });
+    return this.usersRepository.findOneAndAllAddressesByEmail(email);
   }
 
   findOneBySocialId(socialId: string): Promise<User | undefined> {
-    return this.usersRepository.findOneBySocialId(socialId);
+    return this.usersRepository.findOneAndAllAddressesBySocialId(socialId);
   }
 
-  async remove(id: string): Promise<User> {
-    const user = await this.usersRepository.findOneOrFail({ where: { id } });
+  async remove(user: User): Promise<User> {
     return this.usersRepository.remove(user);
   }
 

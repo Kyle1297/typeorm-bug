@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import * as uuid from 'uuid-with-v6';
 import {
   Column,
@@ -9,17 +9,11 @@ import {
   PrimaryColumn,
   BeforeInsert,
 } from 'typeorm';
-
 import { User } from '../users/user.entity';
-
-export enum SocialProviderTypes {
-  FACEBOOK = 'facebook',
-  GOOGLE = 'google',
-}
-
-registerEnumType(SocialProviderTypes, {
-  name: 'SocialAuthProviders',
-});
+import {
+  SocialProviderScalar,
+  SocialProviderTypes,
+} from './scalars/SocialProviderScalar';
 
 @ObjectType()
 @Entity()
@@ -28,7 +22,7 @@ export class SocialProvider {
   @PrimaryColumn('uuid')
   id: string;
 
-  @Field()
+  @Field((_type) => SocialProviderScalar)
   @Column({ nullable: false })
   provider: SocialProviderTypes;
 

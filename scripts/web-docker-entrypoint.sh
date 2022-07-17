@@ -8,7 +8,7 @@ wait_for()
   echo "$2:$3 available"
 }
 
-wait_for 10 db 5432
+wait_for 10 $POSTGRES_HOST $POSTGRES_PORT
 
 yarn typeorm migration:run
 

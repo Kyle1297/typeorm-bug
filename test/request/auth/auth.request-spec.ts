@@ -19,9 +19,15 @@ import { InvalidCredentialsError } from 'src/server/app/auth/responses/invalid-c
 import { AuthUserResponse } from 'src/server/app/auth/responses/auth-user.response';
 import { InvalidInputError } from 'src/server/app/graphql/responses/invalid-input.error';
 import { CredentialsTakenError } from 'src/server/app/auth/responses/credentials-taken.error';
-import { SocialProviderTypes } from 'src/server/app/auth/auth.entity';
 import { SocialNotRegisteredError } from 'src/server/app/auth/responses/social-not-registered.error';
 import { SocialAlreadyAssignedError } from 'src/server/app/auth/responses/social-already-assigned.error';
+import {
+  socialProviderTypes,
+  SocialProviderTypes,
+} from 'src/server/app/auth/scalars/SocialProviderScalar';
+import { LoginSocialInput } from 'src/server/app/auth/inputs/login-social.input';
+import { RegisterSocialInput } from 'src/server/app/auth/inputs/register-social.input';
+import { ErrorResponse } from 'src/server/app/graphql/interfaces/error-response.interface';
 
 describe('AuthModule (e2e)', () => {
   let e2e: E2EApp;
@@ -220,11 +226,10 @@ describe('AuthModule (e2e)', () => {
     });
   });
 
-  describe.each(Object.values(SocialProviderTypes))(
+  describe.each(socialProviderTypes)(
     `SocialAuth %s`,
     (provider: SocialProviderTypes) => {
       let socialProfile: Profile;
-      const providerEnum = provider.toUpperCase();
 
       beforeEach(async () => {
         socialProfile = socialProfileFactory.buildOne({ provider });
@@ -273,7 +278,7 @@ describe('AuthModule (e2e)', () => {
           variables: {
             input: {
               ...loginSocialInput,
-              provider: providerEnum,
+              provider: provider,
             },
           },
         };
@@ -312,7 +317,7 @@ describe('AuthModule (e2e)', () => {
 
           const [response] = result.body.data.loginSocial;
           expect(response.__typename).toBe(SocialNotRegisteredError.name);
-          expect(response.provider).toBe(providerEnum);
+          expect(response.provider).toBe(provider);
         });
 
         it(`should return errors, if ${provider} login is not successful`, async () => {
@@ -366,7 +371,7 @@ describe('AuthModule (e2e)', () => {
           variables: {
             input: {
               ...registerSocialInput,
-              provider: providerEnum,
+              provider: provider,
             },
           },
         };
@@ -408,7 +413,7 @@ describe('AuthModule (e2e)', () => {
           const [response] = result.body.data.registerSocial;
 
           expect(response.__typename).toBe(SocialAlreadyAssignedError.name);
-          expect(response.provider).toBe(providerEnum);
+          expect(response.provider).toBe(provider);
         });
 
         it(`should return error if ${provider} credentials are already taken`, async () => {

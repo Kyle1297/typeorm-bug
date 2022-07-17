@@ -6,7 +6,11 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      url: process.env.DB_URL,
+      host: process.env.POSTGRES_HOST,
+      port: Number(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRS_PASSWORD,
+      database: process.env.POSTGRES_DB,
       autoLoadEntities: true,
       ssl:
         process.env.NODE_ENV === 'production'

@@ -1,7 +1,4 @@
-enum EitherType {
-  ERROR,
-  RESULT,
-}
+type EitherType = 'ERROR' | 'RESULT';
 
 type EitherOf<T, U> = [U] extends [never] ? T : U;
 
@@ -27,11 +24,11 @@ export class EitherWrapper<T, U> implements Either<T, U> {
   }
 
   isError(): boolean {
-    return this._type === EitherType.ERROR;
+    return this._type === 'ERROR';
   }
 
   isResult(): boolean {
-    return this._type === EitherType.RESULT;
+    return this._type === 'RESULT';
   }
 
   get value(): EitherOf<T, U> {
@@ -52,11 +49,11 @@ export class EitherWrapper<T, U> implements Either<T, U> {
 }
 
 const of = <U>(result: U): Either<never, U> => {
-  return new EitherWrapper<never, U>(result, EitherType.RESULT);
+  return new EitherWrapper<never, U>(result, 'RESULT');
 };
 
 const error = <T>(error: T): Either<T, never> => {
-  return new EitherWrapper<T, never>(error, EitherType.ERROR);
+  return new EitherWrapper<T, never>(error, 'ERROR');
 };
 
 export const either = { of, error };

@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthUserResponse } from './responses/auth-user.response';
 import { RegisterUserInput } from './inputs/register-user.input';
 import { Profile } from 'passport';
-import { SocialProviderTypes } from './auth.entity';
 import { SocialProviderRepository } from './auth.repository';
 import { CredentialsTakenError } from './responses/credentials-taken.error';
 import { InvalidCredentialsError } from './responses/invalid-credentials.error';
@@ -13,6 +12,7 @@ import { UserService } from '../users/user.service';
 import { User } from '../users/user.entity';
 import { either, Either } from 'src/server/common/utils/either';
 import { RegisterSocialInput } from './inputs/register-social.input';
+import { SocialProviderTypes } from './scalars/SocialProviderScalar';
 
 @Injectable()
 export class AuthService {

@@ -1,24 +1,67 @@
-FROM node:14-alpine AS build
+###################
+# BUILD FOR LOCAL DEVELOPMENT
+###################
 
-# Create App dir
-RUN mkdir -p /app
+FROM node:14-alpine As development
 
-# Set working directory to App dir
-WORKDIR /app
+# Create app directory
+WORKDIR /usr/src/app
 
-# Copy project files
-COPY . .
+# Copy application dependency manifests to the container image.
+# A wildcard is used to ensure copying both package.json AND package-lock.json (when available).
+# Copying this first prevents re-running npm install on every code change.
+COPY --chown=node:node package.json yarn.lock ./
 
-# Install dependencies
-RUN npm install
+# Install app dependencies using `npm ci` equivalent command instead of `npm install`
+RUN yarn install --frozen-lockfile
+
+# Bundle app source
+COPY --chown=node:node . .
+
+# USER node
 
 ENTRYPOINT ["scripts/web-docker-entrypoint.sh"]
 
-FROM node:14-alpine as app
+###################
+# BUILD FOR PRODUCTION
+###################
 
-## Copy built node modules and binaries without including the toolchain
-COPY --from=build /app .
+FROM node:14-alpine As build
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-ENTRYPOINT ["scripts/web-docker-entrypoint.sh"]
+COPY --chown=node:node package*.json ./
+
+# In order to run `npm run build` we need access to the Nest CLI.
+# The Nest CLI is a dev dependency,
+# In the previous development stage we ran `npm ci` which installed all dependencies.
+# So we can copy over the node_modules directory from the development image into this build image.
+COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
+
+COPY --chown=node:node . .
+
+# Run the build command which creates the production bundle
+RUN yarn build
+
+# Set NODE_ENV environment variable
+ENV NODE_ENV production
+
+# Running `npm ci` removes the existing node_modules directory.
+# Passing in --only=production ensures that only the production dependencies are installed.
+# This ensures that the node_modules directory is as optimized as possible.
+RUN yarn ci --only=production && yarn cache clean --force
+
+# USER node
+
+###################
+# PRODUCTION
+###################
+
+FROM node:14-alpine As production
+
+# Copy the bundled code from the build stage to the production image
+COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+
+# Start the server using the production build
+CMD [ "node", "dist/main.js" ]

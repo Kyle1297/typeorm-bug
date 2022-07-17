@@ -1,14 +1,76 @@
-# ------------------------------------------------------
-# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
-# ------------------------------------------------------
+input AddAddressInput {
+  """E.g. leave on porch, call on delivery, security codes on entry, etc."""
+  additionalNotes: String = ""
 
-type SocialProvider {
+  """State, province or region"""
+  administrativeArea: String!
+  countryCode: String!
+
+  """General instructions for delivery and/or pickup"""
+  instructions: AddressInstructionScalar!
+
+  """Street address line 1"""
+  line1: String!
+
+  """Street address line 2"""
+  line2: String = ""
+
+  """City or town"""
+  locality: String!
+
+  """Place or business name"""
+  organisationName: String = ""
+  postalCode: String!
+
+  """Different address types for customers, workers and their businesses"""
+  type: AddressTypeScalar!
+}
+
+type Address {
+  """E.g. leave on porch, call on delivery, security codes on entry, etc."""
+  additionalNotes: String!
+
+  """State, province or region"""
+  administrativeArea: String!
+  countryCode: String!
+  createdAt: DateTime!
   id: ID!
-  provider: String!
-  socialId: String!
+
+  """General instructions for delivery and/or pickup"""
+  instructions: AddressInstructionScalar!
+
+  """Street address line 1"""
+  line1: String!
+
+  """Street address line 2"""
+  line2: String!
+
+  """City or town"""
+  locality: String!
+
+  """Place or business name"""
+  organisationName: String!
+  postalCode: String!
+
+  """Different address types for customers, workers and their businesses"""
+  type: AddressTypeScalar!
+  updatedAt: DateTime!
+}
+
+"""General instructions for delivery and/or pickup"""
+scalar AddressInstructionScalar
+
+"""Different address types for customers, workers and their businesses"""
+scalar AddressTypeScalar
+
+type AuthUserResponse {
+  token: String!
   user: User!
-  created_at: DateTime!
-  updated_at: DateTime!
+}
+
+type CredentialsTakenError implements ErrorResponse {
+  message: String!
+  providedEmail: String!
 }
 
 """
@@ -16,39 +78,104 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type User {
-  id: ID!
-  firstName: String!
-  lastName: String!
-  socialProviders: [SocialProvider!]!
-  created_at: DateTime!
-  updated_at: DateTime!
+interface ErrorResponse {
+  message: String!
 }
 
-type Order {
-  id: Float!
-  alias: String!
-  user: User!
-  thing: Thing!
-  created_at: DateTime!
-  updated_at: DateTime!
+type InputError {
+  field: String!
+  messages: [String!]!
 }
 
-type Thing {
-  id: Float!
-  name: String!
-  orders: [Order]!
-  created_at: DateTime!
-  updated_at: DateTime!
+type InvalidCredentialsError implements ErrorResponse {
+  message: String!
+  providedEmail: String!
+}
+
+type InvalidInputError implements ErrorResponse {
+  errors: [InputError!]!
+  message: String!
+}
+
+input LoginSocialInput {
+  accessToken: String!
+  provider: SocialProviderScalar!
+}
+
+union LoginSocialResult = AuthUserResponse | SocialNotRegisteredError
+
+input LoginUserInput {
+  email: String!
+  password: String!
+}
+
+union LoginUserResult = AuthUserResponse | InvalidCredentialsError
+
+type Mutation {
+  addAddress(input: AddAddressInput!): Address!
+  login(input: LoginUserInput!): [LoginUserResult!]!
+  loginSocial(input: LoginSocialInput!): [LoginSocialResult!]!
+  register(input: RegisterUserInput!): [RegisterUserResult!]!
+  registerSocial(input: RegisterSocialInput!): [RegisterSocialResult!]!
+  removeAddress(id: ID!): Address!
+  removeCurrentUser: User!
 }
 
 type Query {
-  users: [User!]!
-  whoAmI: User!
-  things: [Thing!]!
-  orders: [Order!]!
+  currentUser: User!
 }
 
-type Mutation {
-  createOrder(alias: String!, thingName: String!): Order!
+input RegisterSocialInput {
+  accessToken: String!
+  phoneCountryCode: String!
+  phoneNumber: String!
+  provider: SocialProviderScalar!
+}
+
+union RegisterSocialResult = AuthUserResponse | CredentialsTakenError | SocialAlreadyAssignedError
+
+input RegisterUserInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  phoneCountryCode: String!
+  phoneNumber: String!
+}
+
+union RegisterUserResult = AuthUserResponse | CredentialsTakenError | InvalidInputError
+
+type SocialAlreadyAssignedError implements ErrorResponse {
+  message: String!
+  provider: SocialProviderScalar!
+}
+
+type SocialNotRegisteredError implements ErrorResponse {
+  message: String!
+  provider: SocialProviderScalar!
+}
+
+type SocialProvider {
+  createdAt: DateTime!
+  id: ID!
+  provider: SocialProviderScalar!
+  socialId: String!
+  updatedAt: DateTime!
+  user: User!
+}
+
+"""Social provider type such as facebook or google"""
+scalar SocialProviderScalar
+
+type User {
+  addresses: [Address!]!
+  createdAt: DateTime!
+  email: String!
+  firstName: String!
+  id: ID!
+  lastName: String!
+  phoneCountryCode: String!
+  phoneNumber: String!
+  socialProviders: [SocialProvider!]!
+  updatedAt: DateTime!
 }

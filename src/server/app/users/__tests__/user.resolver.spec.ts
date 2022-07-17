@@ -17,34 +17,21 @@ describe('UserResolver', () => {
     service = module.get<UserService>(UserService);
   });
 
-  describe('users', () => {
-    it('should return an array of users', async () => {
-      const expected = userFactory.buildMany(3);
-      jest.spyOn(service, 'findAll').mockResolvedValueOnce(expected);
-
-      const result = await resolver.users();
-
-      expect(result).toBe(expected);
-    });
-  });
-
-  describe('user', () => {
-    it('should return given user with given email', async () => {
+  describe('currentUser', () => {
+    it('should retrieve current user', async () => {
       const expected = userFactory.buildOne();
-      jest.spyOn(service, 'findOneByEmail').mockResolvedValueOnce(expected);
-
-      const result = await resolver.user(expected.email);
+      const result = await resolver.currentUser(expected);
 
       expect(result).toBe(expected);
     });
   });
 
-  describe('removeUser', () => {
-    it('should removeUser', async () => {
+  describe('removeCurrentUser', () => {
+    it('should remove current user', async () => {
       const expected = userFactory.buildOne();
       jest.spyOn(service, 'remove').mockResolvedValueOnce(expected);
 
-      const result = await resolver.removeUser(expected.id);
+      const result = await resolver.removeCurrentUser(expected);
 
       expect(result).toBe(expected);
     });

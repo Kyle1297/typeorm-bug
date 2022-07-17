@@ -17,12 +17,12 @@ import {
   MinLength,
 } from 'class-validator';
 import * as bcrypt from 'bcryptjs';
-
 import { SocialProvider } from '../auth/auth.entity';
+import { Address, Addressable } from '../addresses/address.entity';
 
 @ObjectType()
 @Entity()
-export class User {
+export class User implements Addressable {
   @Field((_type) => ID)
   @PrimaryColumn('uuid')
   id: string;
@@ -32,10 +32,9 @@ export class User {
   @Column({ unique: true, nullable: false })
   email: string;
 
-  @Field()
   @MinLength(8)
   @Column({ nullable: true })
-  password: string;
+  password?: string;
 
   @Field()
   @MaxLength(255)
@@ -62,10 +61,14 @@ export class User {
     (_type) => SocialProvider,
     (socialProvider) => socialProvider.user,
     {
-      nullable: true,
+      nullable: false,
     },
   )
   socialProviders: SocialProvider[];
+
+  @Field((_type) => [Address])
+  @OneToMany((_type) => Address, (address) => address.entityId)
+  addresses: Address[];
 
   @Field()
   @CreateDateColumn()

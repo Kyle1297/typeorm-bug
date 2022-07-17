@@ -3,15 +3,11 @@ import * as Strategy from 'passport-facebook-token';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { Profile } from 'passport';
-import { AuthTypes } from '../types/auth.types';
 import facebookConfig from 'src/server/config/facebook.config';
 import { VerifiedCallback } from 'passport-jwt';
 
 @Injectable()
-export class FacebookStrategy extends PassportStrategy(
-  Strategy,
-  AuthTypes.FACEBOOK,
-) {
+export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
   constructor(
     @Inject(facebookConfig.KEY)
     private facebookConf: ConfigType<typeof facebookConfig>,

@@ -5,12 +5,10 @@ import { FactoryBuilder } from 'factory.io';
 import jwtConfig from 'src/server/config/jwt.config';
 import { User } from 'src/server/app/users/user.entity';
 import { LoginSocialInput } from 'src/server/app/auth/inputs/login-social.input';
-import {
-  SocialProvider,
-  SocialProviderTypes,
-} from 'src/server/app/auth/auth.entity';
+import { SocialProvider } from 'src/server/app/auth/auth.entity';
 import { RegisterSocialInput } from 'src/server/app/auth/inputs/register-social.input';
 import { userFactory } from './user.factory';
+import { socialProviderTypes } from 'src/server/app/auth/scalars/SocialProviderScalar';
 
 const config = jwtConfig();
 const jwtService = new JwtService({
@@ -32,7 +30,7 @@ export function authHeaderFactory(user: Partial<User>) {
 export const loginSocialInputFactory = FactoryBuilder.of(LoginSocialInput)
   .props({
     accessToken: faker.datatype.uuid(),
-    provider: faker.random.arrayElement(Object.values(SocialProviderTypes)),
+    provider: faker.random.arrayElement(socialProviderTypes),
   })
   .build();
 
@@ -56,7 +54,7 @@ const emailFactory = FactoryBuilder.of<Email>()
 
 export const socialProfileFactory = FactoryBuilder.of<Profile>()
   .props({
-    provider: faker.random.arrayElement(Object.values(SocialProviderTypes)),
+    provider: faker.random.arrayElement(socialProviderTypes),
     id: faker.datatype.uuid(),
     displayName: faker.internet.userName(),
     emails: emailFactory.buildMany(2),
@@ -73,7 +71,7 @@ interface Email {
 
 export const socialProviderFactory = FactoryBuilder.of(SocialProvider)
   .props({
-    provider: faker.random.arrayElement(Object.values(SocialProviderTypes)),
+    provider: faker.random.arrayElement(socialProviderTypes),
     socialId: faker.datatype.uuid(),
     user: userFactory.buildOne(),
     createdAt: faker.date.future(),

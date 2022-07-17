@@ -4,26 +4,25 @@ services:
   web:
     container_name: web
     build:
+      dockerfile: Dockerfile
       context: .
-    working_dir: /app
+      target: development # only build the development stage of our image
     env_file:
-      - .env
+    - .env
+    volumes:
+      - .:/usr/src/app
+      - ./usr/src/app/node_modules # for hot reloading
     ports:
       - ${PORT}:${PORT}
     depends_on:
       - db
-    volumes:
-      - .:/app
-    restart: on-failure
-    entrypoint: scripts/web-docker-entrypoint.sh
-    command: yarn start:dev
+    command: npm run start:dev
 
   db:
     container_name: db
     image: postgres:13.4-alpine
-    environment:
-      # Login without password
-      POSTGRES_HOST_AUTH_METHOD: "trust"
-      # Auto-create test DB
-      POSTGRES_DB: test
     restart: always
+    env_file:
+      .env
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
