@@ -10,7 +10,6 @@ import {
   addressFactory,
   updateAddressInputFactory,
 } from 'test/factories/address.factory';
-import { User } from 'src/server/app/users/user.entity';
 import { AddAddressInput } from '../../../src/server/app/addresses/input/add-address.input';
 import { UpdateAddressInput } from '../../../src/server/app/addresses/input/update-address.input';
 
@@ -484,7 +483,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -511,7 +510,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -538,7 +537,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -616,7 +615,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -672,7 +671,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -704,7 +703,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -772,7 +771,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -808,7 +807,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -843,7 +842,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'MEET_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -878,7 +877,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -913,7 +912,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -948,7 +947,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'MEET_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -983,7 +982,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -1018,7 +1017,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP_AND_DELIVERY',
         }),
@@ -1053,7 +1052,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'PICKUP',
         }),
@@ -1088,7 +1087,7 @@ describe('AddressModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           instructions: 'LEAVE_AT_DOOR',
           type: 'DELIVERY',
         }),

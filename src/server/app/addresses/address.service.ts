@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Address } from './address.entity';
+import { Address, AddressableTypes } from './address.entity';
 import { AddAddressInput } from './input/add-address.input';
 import { AddressRepository } from './address.repository';
 import { User } from '../users/user.entity';
@@ -16,7 +16,7 @@ export class AddressService {
     const preparedAddress = this.addressRepository.create({
       ...address,
       entityId: user.id,
-      entityType: User.name,
+      entityType: 'User',
     });
 
     return this.addressRepository.save(preparedAddress);
@@ -24,7 +24,7 @@ export class AddressService {
 
   async remove(
     id: string,
-    entity: PolymorphicChildInterface,
+    entity: PolymorphicChildInterface<AddressableTypes>,
   ): Promise<Address> {
     const address = await this.addressRepository.findOneOrError(id);
 
@@ -36,7 +36,7 @@ export class AddressService {
   async update(
     id: string,
     addressData: UpdateAddressInput,
-    entity: PolymorphicChildInterface,
+    entity: PolymorphicChildInterface<AddressableTypes>,
   ): Promise<Address> {
     const address = await this.addressRepository.findOneOrError(id);
 

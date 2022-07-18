@@ -7,7 +7,6 @@ import {
   addressFactory,
   updateAddressInputFactory,
 } from 'test/factories/address.factory';
-import { User } from '../../users/user.entity';
 
 describe('AddressResolver', () => {
   let resolver: AddressResolver;
@@ -27,7 +26,7 @@ describe('AddressResolver', () => {
       const user = userFactory.buildOne();
       const address = addressFactory.buildOne({
         entityId: user.id,
-        entityType: User.name,
+        entityType: 'User',
         instructions: 'LEAVE_AT_DOOR',
         type: 'PICKUP',
       });
@@ -44,7 +43,7 @@ describe('AddressResolver', () => {
       const user = userFactory.buildOne();
       const address = addressFactory.buildOne({
         entityId: user.id,
-        entityType: User.name,
+        entityType: 'User',
         instructions: 'LEAVE_AT_DOOR',
         type: 'PICKUP',
       });
@@ -69,7 +68,7 @@ describe('AddressResolver', () => {
       const user = userFactory.buildOne();
       const address = addressFactory.buildOne({
         entityId: user.id,
-        entityType: User.name,
+        entityType: 'User',
         instructions: 'LEAVE_AT_DOOR',
         type: 'PICKUP',
       });

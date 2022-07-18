@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { PolymorphicChildInterface } from 'src/server/common/types/PolymorphicChildInterface';
 import {
   addAddressInputFactory,
   addressFactory,
   updateAddressInputFactory,
 } from 'test/factories/address.factory';
 import { userFactory } from 'test/factories/user.factory';
-import { User } from '../../users/user.entity';
+import { AddressableTypes } from '../address.entity';
 import { AddressRepository } from '../address.repository';
 import { AddressService } from '../address.service';
 
@@ -32,7 +33,7 @@ describe('AddressService', () => {
       const address = addressFactory.buildOne({
         ...addAddressInput,
         entityId: user.id,
-        entityType: User.name,
+        entityType: 'User',
       });
       jest.spyOn(addressRepository, 'create').mockReturnValueOnce(address);
       jest.spyOn(addressRepository, 'save').mockResolvedValueOnce(address);
@@ -46,9 +47,9 @@ describe('AddressService', () => {
   describe('update', () => {
     it('should update address', async () => {
       const user = userFactory.buildOne();
-      const entity = {
+      const entity: PolymorphicChildInterface<AddressableTypes> = {
         entityId: user.id,
-        entityType: User.name,
+        entityType: 'User',
       };
       const address = addressFactory.buildOne({
         ...entity,
@@ -80,7 +81,7 @@ describe('AddressService', () => {
         instructions: 'LEAVE_AT_DOOR',
         type: 'PICKUP',
         entityId: user.id,
-        entityType: User.name,
+        entityType: 'User',
       });
       jest
         .spyOn(addressRepository, 'findOneOrError')
@@ -89,7 +90,7 @@ describe('AddressService', () => {
 
       const result = await service.remove(address.id, {
         entityId: user.id,
-        entityType: User.name,
+        entityType: 'User',
       });
 
       expect(result).toBe(address);

@@ -5,7 +5,6 @@ import { GQL } from '../constants';
 import { authHeaderFactory } from '../../factories/auth.factory';
 import { E2EApp, initializeApp } from '../test-utils/initialize-app';
 import { addressFactory } from 'test/factories/address.factory';
-import { User } from 'src/server/app/users/user.entity';
 import {
   UpdateUserNameInput,
   UpdateUserPhoneInput,
@@ -46,7 +45,7 @@ describe('UserModule (e2e)', () => {
       const address = await e2e.dbTestUtils.saveOne(
         addressFactory.buildOne({
           entityId: user.id,
-          entityType: User.name,
+          entityType: 'User',
           type: 'PICKUP_AND_DELIVERY',
           instructions: 'LEAVE_AT_DOOR',
         }),

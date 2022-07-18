@@ -21,7 +21,7 @@ export class UserRepository extends Repository<User> {
         'user.addresses',
         Address,
         'address',
-        `address.entityId = user.id AND address.entityType = '${User.name}'`,
+        "address.entityId = user.id AND address.entityType = 'User'",
       )
       .where('providers.socialId = :socialId', { socialId })
       .getOne();
@@ -33,7 +33,7 @@ export class UserRepository extends Repository<User> {
         'user.addresses',
         Address,
         'address',
-        `address.entityId = user.id AND address.entityType = '${User.name}'`,
+        "address.entityId = user.id AND address.entityType = 'User'",
       )
       .where('user.email = :email', { email })
       .getOne();

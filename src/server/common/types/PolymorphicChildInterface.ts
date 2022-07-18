@@ -1,4 +1,4 @@
-export interface PolymorphicChildInterface {
+export interface PolymorphicChildInterface<T> {
   entityId: string;
-  entityType: string;
+  entityType: T;
 }

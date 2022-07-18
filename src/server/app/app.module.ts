@@ -9,6 +9,8 @@ import { UserModule } from './users/user.module';
 import { GraphqlConfigService } from '../config/graphql.config';
 import { TypeOrmConfigService } from '../config/typeorm.config';
 import { AddressModule } from './addresses/address.module';
+import { BusinessModule } from './businesses/business.module';
+import { WasherModule } from './washers/washer.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { AddressModule } from './addresses/address.module';
     UserModule,
     AuthModule,
     AddressModule,
+    BusinessModule,
+    WasherModule,
   ],
   providers: [SeedService],
 })

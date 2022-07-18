@@ -1,9 +1,9 @@
 import { PolymorphicChildInterface } from 'src/server/common/types/PolymorphicChildInterface';
-import { Address } from '../address.entity';
+import { Address, AddressableTypes } from '../address.entity';
 
 const validateAddressEntityOwnership = (
   address: Address,
-  entity: PolymorphicChildInterface,
+  entity: PolymorphicChildInterface<AddressableTypes>,
 ): Error | void => {
   if (
     address.entityType !== entity.entityType ||

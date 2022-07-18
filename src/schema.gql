@@ -68,6 +68,17 @@ type AuthUserResponse {
   user: User!
 }
 
+type Business {
+  address: Address!
+  businessNumber: String!
+  createdAt: DateTime!
+  id: ID!
+  isGstRegistered: Boolean!
+  name: String!
+  updatedAt: DateTime!
+  washer: Washer!
+}
+
 type CredentialsTakenError implements ErrorResponse {
   message: String!
   providedEmail: String!
@@ -220,3 +231,20 @@ type User {
   socialProviders: [SocialProvider!]!
   updatedAt: DateTime!
 }
+
+type Washer {
+  address: Address!
+  business: Business!
+  createdAt: DateTime!
+  firstAbleToWorkAt: DateTime!
+  id: ID!
+  language: String!
+  lastStatusChangeAt: DateTime!
+
+  """The current status of the washer"""
+  status: WasherStatusScalar!
+  updatedAt: DateTime!
+}
+
+"""Different states of a washer"""
+scalar WasherStatusScalar

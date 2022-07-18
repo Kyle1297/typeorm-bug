@@ -2,7 +2,6 @@ import * as faker from 'faker';
 import { FactoryBuilder } from 'factory.io';
 import { Address } from 'src/server/app/addresses/address.entity';
 import { AddAddressInput } from 'src/server/app/addresses/input/add-address.input';
-import { User } from 'src/server/app/users/user.entity';
 import { addressTypes } from 'src/server/app/addresses/scalars/AddressTypeScalar';
 import { addressInstructions } from 'src/server/app/addresses/scalars/AddressInstructionScalar';
 import { UpdateAddressInput } from 'src/server/app/addresses/input/update-address.input';
@@ -41,7 +40,7 @@ export const addressFactory = FactoryBuilder.of(Address)
   .props({
     id: faker.datatype.uuid(),
     entityId: faker.datatype.uuid(),
-    entityType: User.name,
+    entityType: 'User',
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
   })

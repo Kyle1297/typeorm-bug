@@ -30,7 +30,7 @@ export class AddressResolver {
   ): Promise<Address> {
     return this.addressService.remove(id, {
       entityId: user.id,
-      entityType: User.name,
+      entityType: 'User',
     });
   }
 
@@ -43,7 +43,7 @@ export class AddressResolver {
   ): Promise<Address> {
     return this.addressService.update(id, input, {
       entityId: user.id,
-      entityType: User.name,
+      entityType: 'User',
     });
   }
 }

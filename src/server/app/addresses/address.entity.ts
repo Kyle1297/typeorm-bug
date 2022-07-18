@@ -22,9 +22,12 @@ export interface Addressable {
   id: string;
 }
 
+export const addressableTypes = ['User', 'Washer', 'Business'] as const;
+export type AddressableTypes = typeof addressableTypes[number];
+
 @ObjectType()
 @Entity()
-export class Address implements PolymorphicChildInterface {
+export class Address implements PolymorphicChildInterface<AddressableTypes> {
   @Field((_type) => ID)
   @PrimaryColumn('uuid')
   id: string;
@@ -89,7 +92,7 @@ export class Address implements PolymorphicChildInterface {
   entityId: string;
 
   @Column({ nullable: false })
-  entityType: string;
+  entityType: AddressableTypes;
 
   @Field()
   @CreateDateColumn()
