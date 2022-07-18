@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import * as uuid from 'uuid-with-v6';
-import { IsISO31661Alpha2, MaxLength } from 'class-validator';
+import { IsISO31661Alpha2, MaxLength, validateOrReject } from 'class-validator';
 import { PolymorphicChildInterface } from 'src/server/common/types/PolymorphicChildInterface';
 import {
   AddressInstructionScalar,
@@ -106,8 +106,9 @@ export class Address implements PolymorphicChildInterface {
 
   @BeforeInsert()
   @BeforeUpdate()
-  validate() {
+  async validate() {
     this.validateAddressTypeAndInstructions();
+    await validateOrReject(this);
   }
 
   validateAddressTypeAndInstructions() {

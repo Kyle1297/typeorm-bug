@@ -8,12 +8,14 @@ import {
   UpdateDateColumn,
   PrimaryColumn,
   BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import {
   SocialProviderScalar,
   SocialProviderTypes,
 } from './scalars/SocialProviderScalar';
+import { validateOrReject } from 'class-validator';
 
 @ObjectType()
 @Entity()
@@ -47,5 +49,11 @@ export class SocialProvider {
   @BeforeInsert()
   setIdAsUuid() {
     this.id = uuid.v6();
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async validate() {
+    await validateOrReject(this);
   }
 }

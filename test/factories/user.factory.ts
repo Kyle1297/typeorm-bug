@@ -7,7 +7,7 @@ import { User } from 'src/server/app/users/user.entity';
 export const loginUserInputFactory = FactoryBuilder.of(LoginUserInput)
   .props({
     email: faker.internet.email(),
-    password: faker.internet.password(),
+    password: faker.internet.password(10),
   })
   .build();
 
@@ -16,7 +16,7 @@ export const registerUserInputFactory = FactoryBuilder.of(RegisterUserInput)
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
     phoneCountryCode: 'AU',
-    phoneNumber: faker.phone.phoneNumber('+61 4## ### ###'),
+    phoneNumber: faker.phone.phoneNumber('+61 431 ### ###'),
   })
   .mixins([loginUserInputFactory])
   .build();

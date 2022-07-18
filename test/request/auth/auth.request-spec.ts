@@ -100,7 +100,7 @@ describe('AuthModule (e2e)', () => {
       await e2e.dbTestUtils.saveOne(
         userFactory.buildOne({
           ...userLoginInput,
-          password: 'invalid',
+          password: 'invalidPassword',
         }),
       );
 

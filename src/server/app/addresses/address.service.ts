@@ -4,39 +4,50 @@ import { AddAddressInput } from './input/add-address.input';
 import { AddressRepository } from './address.repository';
 import { User } from '../users/user.entity';
 import { PolymorphicChildInterface } from 'src/server/common/types/PolymorphicChildInterface';
+import validateEntity from 'src/server/common/utils/validateEntity';
+import { UpdateAddressInput } from './input/update-address.input';
+import validateAddressEntityOwnership from './utils/validateAddressEntityOwnership';
 
 @Injectable()
 export class AddressService {
-  constructor(private readonly addresssRepository: AddressRepository) {}
+  constructor(private readonly addressRepository: AddressRepository) {}
 
   async save(address: AddAddressInput, user: User): Promise<Address> {
-    const preparedAddress = this.addresssRepository.create({
+    const preparedAddress = this.addressRepository.create({
       ...address,
       entityId: user.id,
       entityType: User.name,
     });
 
-    return this.addresssRepository.save(preparedAddress);
+    return this.addressRepository.save(preparedAddress);
   }
 
   async remove(
     id: string,
     entity: PolymorphicChildInterface,
   ): Promise<Address> {
-    const address = await this.addresssRepository.findOneOrFail({
-      where: { id },
-    });
+    const address = await this.addressRepository.findOneOrError(id);
 
-    // validate that the address belongs to the entity
-    if (
-      address.entityType !== entity.entityType ||
-      address.entityId !== entity.entityId
-    ) {
-      throw new Error(
-        `Unauthorized: Address does not belong to ${entity.entityType} with id ${entity.entityId}`,
-      );
+    validateAddressEntityOwnership(address, entity);
+
+    return this.addressRepository.remove(address);
+  }
+
+  async update(
+    id: string,
+    addressData: UpdateAddressInput,
+    entity: PolymorphicChildInterface,
+  ): Promise<Address> {
+    const address = await this.addressRepository.findOneOrError(id);
+
+    validateAddressEntityOwnership(address, entity);
+
+    for (const [key, value] of Object.entries(addressData)) {
+      address[key] = value;
     }
+    address.validateAddressTypeAndInstructions();
+    await validateEntity(address);
 
-    return this.addresssRepository.remove(address);
+    return this.addressRepository.save({ ...addressData, id });
   }
 }

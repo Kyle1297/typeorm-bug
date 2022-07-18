@@ -36,14 +36,8 @@ export const loginSocialInputFactory = FactoryBuilder.of(LoginSocialInput)
 
 export const registerSocialInputFactory = FactoryBuilder.of(RegisterSocialInput)
   .props({
-    phoneCountryCode: faker.address.countryCode(),
-    phoneNumber: faker.phone.phoneNumber(
-      faker.random.arrayElement([
-        '+61 ### ### ###',
-        '+48 91 ### ## ##',
-        '+1 ### ### ####',
-      ]),
-    ),
+    phoneCountryCode: 'AU',
+    phoneNumber: faker.phone.phoneNumber('+61 431 ### ###'),
   })
   .mixins([loginSocialInputFactory])
   .build();

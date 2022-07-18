@@ -5,8 +5,24 @@ import { AddAddressInput } from 'src/server/app/addresses/input/add-address.inpu
 import { User } from 'src/server/app/users/user.entity';
 import { addressTypes } from 'src/server/app/addresses/scalars/AddressTypeScalar';
 import { addressInstructions } from 'src/server/app/addresses/scalars/AddressInstructionScalar';
+import { UpdateAddressInput } from 'src/server/app/addresses/input/update-address.input';
 
 export const addAddressInputFactory = FactoryBuilder.of(AddAddressInput)
+  .props({
+    organisationName: faker.company.companyName(),
+    line1: faker.address.streetAddress(),
+    line2: faker.address.secondaryAddress(),
+    locality: faker.address.city(),
+    administrativeArea: faker.address.state(),
+    postalCode: faker.address.zipCode(),
+    countryCode: faker.address.countryCode(),
+    instructions: faker.random.arrayElement(addressInstructions),
+    additionalNotes: faker.lorem.sentence(),
+    type: faker.random.arrayElement(addressTypes),
+  })
+  .build();
+
+export const updateAddressInputFactory = FactoryBuilder.of(UpdateAddressInput)
   .props({
     organisationName: faker.company.companyName(),
     line1: faker.address.streetAddress(),

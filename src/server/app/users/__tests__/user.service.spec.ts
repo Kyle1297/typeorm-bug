@@ -33,6 +33,24 @@ describe('UserService', () => {
     });
   });
 
+  describe('update', () => {
+    it('should update user', async () => {
+      const user = userFactory.buildOne();
+      const userData = {
+        firstName: 'New',
+        lastName: 'Name',
+      };
+      const updatedUser = userFactory.buildOne({
+        ...userData,
+        id: user.id,
+      });
+      jest.spyOn(userRepository, 'save').mockResolvedValueOnce(updatedUser);
+
+      const result = await userService.update(user, userData);
+      expect(result).toBe(updatedUser);
+    });
+  });
+
   describe('findOneByEmail', () => {
     it('should return user with given email', async () => {
       const user = userFactory.buildOne();

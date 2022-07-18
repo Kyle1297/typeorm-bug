@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { GraphQLSchemaHost } from '@nestjs/graphql';
@@ -12,6 +13,8 @@ async function bootstrap() {
   const app = await NestFactory.create(ServerModule);
   const configService = app.get(ConfigService);
   app.use(cookieParser());
+
+  app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(configService.get('PORT', '3000'));
 

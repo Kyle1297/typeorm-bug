@@ -2,17 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import {
   addAddressInputFactory,
   addressFactory,
+  updateAddressInputFactory,
 } from 'test/factories/address.factory';
 import { userFactory } from 'test/factories/user.factory';
-import { Repository } from 'typeorm';
 import { User } from '../../users/user.entity';
-import { Address } from '../address.entity';
 import { AddressRepository } from '../address.repository';
 import { AddressService } from '../address.service';
 
 describe('AddressService', () => {
   let service: AddressService;
-  let addressRepository: Repository<Address>;
+  let addressRepository: AddressRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -44,6 +43,36 @@ describe('AddressService', () => {
     });
   });
 
+  describe('update', () => {
+    it('should update address', async () => {
+      const user = userFactory.buildOne();
+      const entity = {
+        entityId: user.id,
+        entityType: User.name,
+      };
+      const address = addressFactory.buildOne({
+        ...entity,
+        instructions: 'LEAVE_AT_DOOR',
+        type: 'PICKUP',
+      });
+      const addressData = updateAddressInputFactory.buildOne();
+      const updatedAddress = addressFactory.buildOne({
+        ...addressData,
+        ...entity,
+        id: address.id,
+      });
+      jest
+        .spyOn(addressRepository, 'save')
+        .mockResolvedValueOnce(updatedAddress);
+      jest
+        .spyOn(addressRepository, 'findOneOrError')
+        .mockResolvedValueOnce(address);
+
+      const result = await service.update(address.id, addressData, entity);
+      expect(result).toBe(updatedAddress);
+    });
+  });
+
   describe('remove', () => {
     it('should remove address', async () => {
       const user = userFactory.buildOne();
@@ -54,7 +83,7 @@ describe('AddressService', () => {
         entityType: User.name,
       });
       jest
-        .spyOn(addressRepository, 'findOneOrFail')
+        .spyOn(addressRepository, 'findOneOrError')
         .mockResolvedValueOnce(address);
       jest.spyOn(addressRepository, 'remove').mockResolvedValueOnce(address);
 

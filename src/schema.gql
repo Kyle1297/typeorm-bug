@@ -119,6 +119,9 @@ type Mutation {
   registerSocial(input: RegisterSocialInput!): [RegisterSocialResult!]!
   removeAddress(id: ID!): Address!
   removeCurrentUser: User!
+  updateAddress(id: ID!, input: UpdateAddressInput!): Address!
+  updateCurrentUserName(input: UpdateUserNameInput!): User!
+  updateCurrentUserPhone(input: UpdateUserPhoneInput!): User!
 }
 
 type Query {
@@ -166,6 +169,44 @@ type SocialProvider {
 
 """Social provider type such as facebook or google"""
 scalar SocialProviderScalar
+
+input UpdateAddressInput {
+  """E.g. leave on porch, call on delivery, security codes on entry, etc."""
+  additionalNotes: String
+
+  """State, province or region"""
+  administrativeArea: String
+  countryCode: String
+
+  """General instructions for delivery and/or pickup"""
+  instructions: AddressInstructionScalar
+
+  """Street address line 1"""
+  line1: String
+
+  """Street address line 2"""
+  line2: String
+
+  """City or town"""
+  locality: String
+
+  """Place or business name"""
+  organisationName: String
+  postalCode: String
+
+  """Different address types for customers, workers and their businesses"""
+  type: AddressTypeScalar
+}
+
+input UpdateUserNameInput {
+  firstName: String!
+  lastName: String!
+}
+
+input UpdateUserPhoneInput {
+  phoneCountryCode: String!
+  phoneNumber: String!
+}
 
 type User {
   addresses: [Address!]!

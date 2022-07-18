@@ -36,4 +36,42 @@ describe('UserResolver', () => {
       expect(result).toBe(expected);
     });
   });
+
+  describe('updateCurrentUserName', () => {
+    it('should update current user name', async () => {
+      const user = userFactory.buildOne();
+      const updatedUser = userFactory.buildOne({
+        ...user,
+        firstName: 'John',
+        lastName: 'Doe',
+      });
+      jest.spyOn(service, 'update').mockResolvedValueOnce(updatedUser);
+
+      const result = await resolver.updateCurrentUserName(user, {
+        firstName: 'John',
+        lastName: 'Doe',
+      });
+
+      expect(result).toBe(updatedUser);
+    });
+  });
+
+  describe('updateCurrentUserPhone', () => {
+    it('should update current user phone', async () => {
+      const user = userFactory.buildOne();
+      const updatedUser = userFactory.buildOne({
+        ...user,
+        phoneCountryCode: '+1',
+        phoneNumber: '555-555-5555',
+      });
+      jest.spyOn(service, 'update').mockResolvedValueOnce(updatedUser);
+
+      const result = await resolver.updateCurrentUserPhone(user, {
+        phoneCountryCode: '+1',
+        phoneNumber: '555-555-5555',
+      });
+
+      expect(result).toBe(updatedUser);
+    });
+  });
 });

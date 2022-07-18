@@ -6,15 +6,18 @@ import {
   UpdateDateColumn,
   OneToMany,
   BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import * as uuid from 'uuid-with-v6';
 import {
   IsEmail,
   IsISO31661Alpha2,
+  IsOptional,
   IsPhoneNumber,
   MaxLength,
   MinLength,
+  validateOrReject,
 } from 'class-validator';
 import * as bcrypt from 'bcryptjs';
 import { SocialProvider } from '../auth/auth.entity';
@@ -33,6 +36,7 @@ export class User implements Addressable {
   email: string;
 
   @MinLength(8)
+  @IsOptional()
   @Column({ nullable: true })
   password?: string;
 
@@ -84,11 +88,17 @@ export class User implements Addressable {
   }
 
   @BeforeInsert()
+  @BeforeUpdate()
+  async validate() {
+    await validateOrReject(this);
+  }
+
+  @BeforeInsert()
   async hashPassword() {
     if (this.password) this.password = await bcrypt.hash(this.password, 10);
   }
 
   async comparePassword(password: string) {
-    return bcrypt.compare(password, this.password);
+    return await bcrypt.compare(password, this.password);
   }
 }

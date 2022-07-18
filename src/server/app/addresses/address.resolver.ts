@@ -7,6 +7,7 @@ import { User } from '../users/user.entity';
 import { Address } from './address.entity';
 import { AddAddressInput } from './input/add-address.input';
 import { AddressService } from './address.service';
+import { UpdateAddressInput } from './input/update-address.input';
 
 @Resolver()
 export class AddressResolver {
@@ -28,6 +29,19 @@ export class AddressResolver {
     @GqlUser() user: User,
   ): Promise<Address> {
     return this.addressService.remove(id, {
+      entityId: user.id,
+      entityType: User.name,
+    });
+  }
+
+  @UseGuards(JwtGqlAuthGuard)
+  @Mutation((_returns) => Address)
+  async updateAddress(
+    @Args({ name: 'id', type: () => ID }) id: string,
+    @Input() input: UpdateAddressInput,
+    @GqlUser() user: User,
+  ): Promise<Address> {
+    return this.addressService.update(id, input, {
       entityId: user.id,
       entityType: User.name,
     });
