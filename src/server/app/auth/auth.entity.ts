@@ -9,6 +9,7 @@ import {
   PrimaryColumn,
   BeforeInsert,
   BeforeUpdate,
+  Index,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import {
@@ -25,10 +26,12 @@ export class SocialProvider {
   id: string;
 
   @Field((_type) => SocialProviderScalar)
+  @Index()
   @Column({ nullable: false })
   provider: SocialProviderTypes;
 
   @Field()
+  @Index({ unique: true })
   @Column({ unique: true, nullable: false })
   socialId: string;
 

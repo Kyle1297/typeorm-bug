@@ -5,6 +5,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
@@ -34,6 +35,7 @@ export class Washer {
   @Field((_type) => WasherStatusScalar, {
     description: 'The current status of the washer',
   })
+  @Index()
   @Column({ nullable: false })
   status: WasherStatuses;
 

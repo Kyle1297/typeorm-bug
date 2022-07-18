@@ -7,6 +7,7 @@ import {
   OneToMany,
   BeforeInsert,
   BeforeUpdate,
+  Index,
 } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import * as uuid from 'uuid-with-v6';
@@ -32,6 +33,7 @@ export class User implements Addressable {
 
   @Field()
   @IsEmail()
+  @Index({ unique: true })
   @Column({ unique: true, nullable: false })
   email: string;
 

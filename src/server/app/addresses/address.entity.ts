@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -85,6 +86,7 @@ export class Address implements PolymorphicChildInterface<AddressableTypes> {
     description:
       'Different address types for customers, workers and their businesses',
   })
+  @Index()
   @Column({ nullable: false })
   type: AddressTypes;
 
