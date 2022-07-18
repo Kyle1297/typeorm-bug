@@ -7,10 +7,6 @@ on:
 
 env:
   node_version: "14.x"
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-  HEROKU_STAGING_APP_NAME: nestjs-starter-staging
-  HEROKU_PRODUCTION_APP_NAME: nestjs-starter-production
 
 concurrency:
   group: ${{ github.ref }}
