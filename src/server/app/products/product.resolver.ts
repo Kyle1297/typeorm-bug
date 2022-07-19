@@ -12,12 +12,12 @@ export class ProductResolver {
   @Query((_returns) => [Product])
   @UseGuards(JwtGqlAuthGuard)
   async products(id: string): Promise<Product> {
-    return this.productService.findAllWithOverview(id);
+    return this.productService.findAll(id);
   }
 
   @Query((_returns) => Product)
   @UseGuards(JwtGqlAuthGuard)
   async product(id: string): Promise<Product> {
-    return this.productService.findOneWithDetails(id);
+    return this.productService.findOne(id);
   }
 }

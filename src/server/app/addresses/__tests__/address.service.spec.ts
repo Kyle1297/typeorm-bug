@@ -56,7 +56,10 @@ describe('AddressService', () => {
         instructions: 'LEAVE_AT_DOOR',
         type: 'PICKUP',
       });
-      const addressData = updateAddressInputFactory.buildOne();
+      const addressData = updateAddressInputFactory.buildOne({
+        instructions: 'MEET_AT_DOOR',
+        type: 'DELIVERY',
+      });
       const updatedAddress = addressFactory.buildOne({
         ...addressData,
         ...entity,

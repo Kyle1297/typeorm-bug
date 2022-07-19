@@ -5,10 +5,11 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Field, ID } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import * as uuid from 'uuid-with-v6';
 import { validateOrReject } from 'class-validator';
 
+@ObjectType()
 export abstract class BaseEntity {
   @Field((_type) => ID)
   @PrimaryColumn('uuid')

@@ -93,6 +93,14 @@ interface ErrorResponse {
   message: String!
 }
 
+type Image {
+  createdAt: DateTime!
+  id: ID!
+  key: String!
+  name: String!
+  updatedAt: DateTime!
+}
+
 type InputError {
   field: String!
   messages: [String!]!
@@ -135,8 +143,48 @@ type Mutation {
   updateCurrentUserPhone(input: UpdateUserPhoneInput!): User!
 }
 
+type Price {
+  aud_in_cents: Float!
+  createdAt: DateTime!
+  id: ID!
+  isPerBag: Boolean!
+  updatedAt: DateTime!
+}
+
+type Product {
+  createdAt: DateTime!
+  description: String!
+  features: [ProductFeature!]!
+  id: ID!
+  image: Image!
+  name: String!
+  price: Price!
+  updatedAt: DateTime!
+}
+
+type ProductFeature {
+  createdAt: DateTime!
+  description: String!
+  id: ID!
+  name: String!
+  options: [ProductFeatureOption!]!
+  updatedAt: DateTime!
+}
+
+type ProductFeatureOption {
+  createdAt: DateTime!
+  description: String!
+  id: ID!
+  isDefault: Boolean!
+  name: String!
+  productFeature: ProductFeature!
+  updatedAt: DateTime!
+}
+
 type Query {
   currentUser: User!
+  product: Product!
+  products: [Product!]!
 }
 
 input RegisterSocialInput {

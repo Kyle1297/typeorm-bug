@@ -11,6 +11,11 @@ import { TypeOrmConfigService } from '../config/typeorm.config';
 import { AddressModule } from './addresses/address.module';
 import { BusinessModule } from './businesses/business.module';
 import { WasherModule } from './washers/washer.module';
+import { PriceModule } from './prices/price.module';
+import { ProductModule } from './products/product.module';
+import { ProductFeatureModule } from './product_features/productFeature.module';
+import { ImageModule } from './images/image.module';
+import { ProductFeatureOptionModule } from './product_feature_options/productFeatureOption.module';
 
 @Module({
   imports: [
@@ -29,6 +34,11 @@ import { WasherModule } from './washers/washer.module';
     AddressModule,
     BusinessModule,
     WasherModule,
+    PriceModule,
+    ProductModule,
+    ProductFeatureModule,
+    ProductFeatureOptionModule,
+    ImageModule,
   ],
   providers: [SeedService],
 })
