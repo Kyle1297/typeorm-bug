@@ -3,35 +3,23 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Column,
-  CreateDateColumn,
   Entity,
   Index,
   OneToOne,
-  PrimaryColumn,
-  UpdateDateColumn,
 } from 'typeorm';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import * as uuid from 'uuid-with-v6';
-import {
-  IsDate,
-  IsLocale,
-  IsOptional,
-  validateOrReject,
-} from 'class-validator';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { IsDate, IsLocale, IsOptional } from 'class-validator';
 import {
   WasherStatuses,
   WasherStatusScalar,
 } from './scalars/WasherStatusScalar';
 import { Address } from '../addresses/address.entity';
 import { Business } from '../businesses/business.entity';
+import { BaseEntity } from 'src/server/common/entities/base.entity';
 
 @ObjectType()
 @Entity()
-export class Washer {
-  @Field((_type) => ID)
-  @PrimaryColumn('uuid')
-  id: string;
-
+export class Washer extends BaseEntity {
   @Field((_type) => WasherStatusScalar, {
     description: 'The current status of the washer',
   })
@@ -63,31 +51,12 @@ export class Washer {
   @OneToOne((_type) => Business, (business) => business.washer)
   business: Business;
 
-  @Field()
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field()
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @BeforeInsert()
-  setIdAsUuid() {
-    this.id = uuid.v6();
-  }
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async validate() {
-    await validateOrReject(this);
-  }
-
   @BeforeInsert()
   setDefaultLastStatusChangeAt() {
     this.lastStatusChangeAt = new Date();
   }
 
-  previousStatus: WasherStatuses | undefined;
+  private previousStatus: WasherStatuses | undefined;
 
   @AfterLoad()
   setPreviousStatus() {

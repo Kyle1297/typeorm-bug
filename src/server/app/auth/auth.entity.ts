@@ -1,30 +1,15 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import * as uuid from 'uuid-with-v6';
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
-  PrimaryColumn,
-  BeforeInsert,
-  BeforeUpdate,
-  Index,
-} from 'typeorm';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { Column, Entity, ManyToOne, Index } from 'typeorm';
 import { User } from '../users/user.entity';
 import {
   SocialProviderScalar,
   SocialProviderTypes,
 } from './scalars/SocialProviderScalar';
-import { validateOrReject } from 'class-validator';
+import { BaseEntity } from 'src/server/common/entities/base.entity';
 
 @ObjectType()
 @Entity()
-export class SocialProvider {
-  @Field((_type) => ID)
-  @PrimaryColumn('uuid')
-  id: string;
-
+export class SocialProvider extends BaseEntity {
   @Field((_type) => SocialProviderScalar)
   @Index()
   @Column({ nullable: false })
@@ -40,23 +25,4 @@ export class SocialProvider {
     nullable: false,
   })
   user: User;
-
-  @Field()
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field()
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @BeforeInsert()
-  setIdAsUuid() {
-    this.id = uuid.v6();
-  }
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async validate() {
-    await validateOrReject(this);
-  }
 }

@@ -1,26 +1,13 @@
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToOne,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import * as uuid from 'uuid-with-v6';
-import { MaxLength, validateOrReject } from 'class-validator';
+import { Column, Entity, OneToOne } from 'typeorm';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { MaxLength } from 'class-validator';
 import { Address } from '../addresses/address.entity';
 import { Washer } from '../washers/washer.entity';
+import { BaseEntity } from 'src/server/common/entities/base.entity';
 
 @ObjectType()
 @Entity()
-export class Business {
-  @Field((_type) => ID)
-  @PrimaryColumn('uuid')
-  id: string;
-
+export class Business extends BaseEntity {
   @Field()
   @MaxLength(255)
   @Column({ nullable: false })
@@ -42,23 +29,4 @@ export class Business {
   @Field((_type) => Washer)
   @OneToOne((_type) => Washer, (washer) => washer.business)
   washer: Washer;
-
-  @Field()
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field()
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @BeforeInsert()
-  setIdAsUuid() {
-    this.id = uuid.v6();
-  }
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async validate() {
-    await validateOrReject(this);
-  }
 }

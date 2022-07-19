@@ -1,38 +1,23 @@
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import * as uuid from 'uuid-with-v6';
-import { IsISO31661Alpha2, MaxLength, validateOrReject } from 'class-validator';
+import { BeforeInsert, BeforeUpdate, Column, Entity, Index } from 'typeorm';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { IsISO31661Alpha2, MaxLength } from 'class-validator';
 import { PolymorphicChildInterface } from 'src/server/common/types/PolymorphicChildInterface';
 import {
   AddressInstructionScalar,
   AddressInstructionTypes,
 } from './scalars/AddressInstructionScalar';
 import { AddressTypes, AddressTypeScalar } from './scalars/AddressTypeScalar';
-
-export interface Addressable {
-  addresses: Address[];
-  id: string;
-}
+import { BaseEntity } from 'src/server/common/entities/base.entity';
 
 export const addressableTypes = ['User', 'Washer', 'Business'] as const;
 export type AddressableTypes = typeof addressableTypes[number];
 
 @ObjectType()
 @Entity()
-export class Address implements PolymorphicChildInterface<AddressableTypes> {
-  @Field((_type) => ID)
-  @PrimaryColumn('uuid')
-  id: string;
-
+export class Address
+  extends BaseEntity
+  implements PolymorphicChildInterface<AddressableTypes>
+{
   @Field({ description: 'Place or business name', defaultValue: '' })
   @MaxLength(255)
   @Column({ nullable: false, default: '' })
@@ -96,26 +81,8 @@ export class Address implements PolymorphicChildInterface<AddressableTypes> {
   @Column({ nullable: false })
   entityType: AddressableTypes;
 
-  @Field()
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field()
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @BeforeInsert()
-  setIdAsUuid() {
-    this.id = uuid.v6();
-  }
-
   @BeforeInsert()
   @BeforeUpdate()
-  async validate() {
-    this.validateAddressTypeAndInstructions();
-    await validateOrReject(this);
-  }
-
   validateAddressTypeAndInstructions() {
     if (this.type === 'BUSINESS' || this.type === 'WASHING') {
       if (this.instructions !== 'NOT_APPLICABLE') {

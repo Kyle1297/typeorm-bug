@@ -6,11 +6,11 @@ import { ProductRepository } from './product.repository';
 export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  findAllWithOverview(id: string): Promise<Product> {
-    return this.productRepository.findAllWithImageAndPrices(id);
+  findAll(id: string): Promise<Product> {
+    return this.productRepository.findAllWithImagePricesAndFeatures(id);
   }
 
-  findOneWithDetails(id: string): Promise<Product> {
+  findOne(id: string): Promise<Product> {
     return this.productRepository.findOneWithImagePricesAndFeatures(id);
   }
 }

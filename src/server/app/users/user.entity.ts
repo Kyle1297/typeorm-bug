@@ -1,16 +1,5 @@
-import {
-  Entity,
-  Column,
-  PrimaryColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-  BeforeInsert,
-  BeforeUpdate,
-  Index,
-} from 'typeorm';
-import { ObjectType, Field, ID } from '@nestjs/graphql';
-import * as uuid from 'uuid-with-v6';
+import { Entity, Column, OneToMany, BeforeInsert, Index } from 'typeorm';
+import { ObjectType, Field } from '@nestjs/graphql';
 import {
   IsEmail,
   IsISO31661Alpha2,
@@ -18,19 +7,15 @@ import {
   IsPhoneNumber,
   MaxLength,
   MinLength,
-  validateOrReject,
 } from 'class-validator';
 import * as bcrypt from 'bcryptjs';
 import { SocialProvider } from '../auth/auth.entity';
-import { Address, Addressable } from '../addresses/address.entity';
+import { Address } from '../addresses/address.entity';
+import { BaseEntity } from 'src/server/common/entities/base.entity';
 
 @ObjectType()
 @Entity()
-export class User implements Addressable {
-  @Field((_type) => ID)
-  @PrimaryColumn('uuid')
-  id: string;
-
+export class User extends BaseEntity {
   @Field()
   @IsEmail()
   @Index({ unique: true })
@@ -75,25 +60,6 @@ export class User implements Addressable {
   @Field((_type) => [Address])
   @OneToMany((_type) => Address, (address) => address.entityId)
   addresses: Address[];
-
-  @Field()
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field()
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @BeforeInsert()
-  setIdAsUuid() {
-    this.id = uuid.v6();
-  }
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async validate() {
-    await validateOrReject(this);
-  }
 
   @BeforeInsert()
   async hashPassword() {

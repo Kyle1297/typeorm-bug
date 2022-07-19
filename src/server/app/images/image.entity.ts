@@ -1,24 +1,11 @@
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import * as uuid from 'uuid-with-v6';
-import { MaxLength, validateOrReject } from 'class-validator';
+import { Column, Entity, Index } from 'typeorm';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { MaxLength } from 'class-validator';
+import { BaseEntity } from 'src/server/common/entities/base.entity';
 
 @ObjectType()
 @Entity()
-export class Image {
-  @Field((_type) => ID)
-  @PrimaryColumn('uuid')
-  id: string;
-
+export class Image extends BaseEntity {
   @Field()
   @MaxLength(255)
   @Column({ nullable: false })
@@ -29,23 +16,4 @@ export class Image {
   @Index({ unique: true })
   @Column({ nullable: false, unique: true })
   key: string;
-
-  @Field()
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field()
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @BeforeInsert()
-  setIdAsUuid() {
-    this.id = uuid.v6();
-  }
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async validate() {
-    await validateOrReject(this);
-  }
 }

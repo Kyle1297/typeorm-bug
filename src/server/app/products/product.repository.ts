@@ -12,10 +12,11 @@ export class ProductRepository extends Repository<Product> {
       .getOne();
   }
 
-  async findAllWithImageAndPrices(id: string): Promise<Product> {
+  async findAllWithImagePricesAndFeatures(id: string): Promise<Product> {
     return this.createQueryBuilder('product')
       .leftJoinAndSelect('product.image', 'image')
       .leftJoinAndSelect('product.prices', 'prices')
+      .leftJoinAndSelect('product.features', 'features')
       .where('product.id = :id', { id })
       .getOne();
   }

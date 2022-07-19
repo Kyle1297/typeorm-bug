@@ -1,16 +1,7 @@
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import * as uuid from 'uuid-with-v6';
-import { validateOrReject } from 'class-validator';
+import { Column, Entity } from 'typeorm';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { PolymorphicChildInterface } from 'src/server/common/types/PolymorphicChildInterface';
+import { BaseEntity } from 'src/server/common/entities/base.entity';
 
 export interface Priceable {
   prices: Price[];
@@ -22,11 +13,10 @@ export type PriceableTypes = typeof priceableTypes[number];
 
 @ObjectType()
 @Entity()
-export class Price implements PolymorphicChildInterface<PriceableTypes> {
-  @Field((_type) => ID)
-  @PrimaryColumn('uuid')
-  id: string;
-
+export class Price
+  extends BaseEntity
+  implements PolymorphicChildInterface<PriceableTypes>
+{
   @Field()
   @Column({ nullable: false })
   isPerBag: boolean;
@@ -40,23 +30,4 @@ export class Price implements PolymorphicChildInterface<PriceableTypes> {
 
   @Column({ nullable: false })
   entityType: PriceableTypes;
-
-  @Field()
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Field()
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @BeforeInsert()
-  setIdAsUuid() {
-    this.id = uuid.v6();
-  }
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async validate() {
-    await validateOrReject(this);
-  }
 }
