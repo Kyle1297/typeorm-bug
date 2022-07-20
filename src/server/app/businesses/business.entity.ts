@@ -1,8 +1,7 @@
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { MaxLength } from 'class-validator';
 import { Address } from '../addresses/address.entity';
-import { Washer } from '../washers/washer.entity';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
 
 @ObjectType()
@@ -24,9 +23,6 @@ export class Business extends BaseEntity {
 
   @Field((_type) => Address)
   @OneToOne((_type) => Address, (address) => address.entityId)
+  @JoinColumn()
   address: Address;
-
-  @Field((_type) => Washer)
-  @OneToOne((_type) => Washer, (washer) => washer.business)
-  washer: Washer;
 }

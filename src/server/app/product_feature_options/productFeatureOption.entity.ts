@@ -1,8 +1,16 @@
-import { Column, Entity, Index, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+} from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { MaxLength } from 'class-validator';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
 import { ProductFeature } from '../product_features/productFeature.entity';
+import { Price } from '../prices/price.entity';
 
 @ObjectType()
 @Entity()
@@ -31,4 +39,11 @@ export class ProductFeatureOption extends BaseEntity {
     },
   )
   productFeature: ProductFeature;
+
+  @Field((_type) => Price, { nullable: true })
+  @OneToOne((_type) => Price, (price) => price.entityId, {
+    nullable: true,
+  })
+  @JoinColumn()
+  price?: Price | null;
 }

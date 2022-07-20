@@ -16,6 +16,7 @@ export const productFactory = FactoryBuilder.of(Product)
       entityId: id,
       entityType: 'Product',
     }),
+    features: [],
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
   })

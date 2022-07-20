@@ -1,8 +1,7 @@
 import { UseGuards } from '@nestjs/common';
-import { Query, Resolver } from '@nestjs/graphql';
+import { Args, ID, Query, Resolver } from '@nestjs/graphql';
 import { JwtGqlAuthGuard } from 'src/server/common/guards/jwt-gql-auth.guard';
 import { Product } from './product.entity';
-
 import { ProductService } from './product.service';
 
 @Resolver()
@@ -11,13 +10,15 @@ export class ProductResolver {
 
   @Query((_returns) => [Product])
   @UseGuards(JwtGqlAuthGuard)
-  async products(id: string): Promise<Product> {
-    return this.productService.findAll(id);
+  async products(): Promise<Product[]> {
+    return this.productService.findAll();
   }
 
   @Query((_returns) => Product)
   @UseGuards(JwtGqlAuthGuard)
-  async product(id: string): Promise<Product> {
+  async product(
+    @Args({ name: 'id', type: () => ID }) id: string,
+  ): Promise<Product> {
     return this.productService.findOne(id);
   }
 }

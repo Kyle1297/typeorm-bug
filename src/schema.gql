@@ -76,7 +76,6 @@ type Business {
   isGstRegistered: Boolean!
   name: String!
   updatedAt: DateTime!
-  washer: Washer!
 }
 
 type CredentialsTakenError implements ErrorResponse {
@@ -177,13 +176,14 @@ type ProductFeatureOption {
   id: ID!
   isDefault: Boolean!
   name: String!
+  price: Price
   productFeature: ProductFeature!
   updatedAt: DateTime!
 }
 
 type Query {
   currentUser: User!
-  product: Product!
+  product(id: ID!): Product!
   products: [Product!]!
 }
 
@@ -279,20 +279,3 @@ type User {
   socialProviders: [SocialProvider!]!
   updatedAt: DateTime!
 }
-
-type Washer {
-  address: Address!
-  business: Business!
-  createdAt: DateTime!
-  firstAbleToWorkAt: DateTime!
-  id: ID!
-  language: String!
-  lastStatusChangeAt: DateTime!
-
-  """The current status of the washer"""
-  status: WasherStatusScalar!
-  updatedAt: DateTime!
-}
-
-"""Different states of a washer"""
-scalar WasherStatusScalar

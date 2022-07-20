@@ -5,6 +5,7 @@ import {
   Column,
   Entity,
   Index,
+  JoinColumn,
   OneToOne,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
@@ -45,10 +46,12 @@ export class Washer extends BaseEntity {
 
   @Field((_type) => Address)
   @OneToOne((_type) => Address, (address) => address.entityId)
+  @JoinColumn()
   address: Address;
 
   @Field((_type) => Business)
-  @OneToOne((_type) => Business, (business) => business.washer)
+  @OneToOne((_type) => Business)
+  @JoinColumn()
   business: Business;
 
   @BeforeInsert()

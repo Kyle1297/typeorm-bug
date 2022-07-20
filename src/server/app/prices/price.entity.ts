@@ -8,7 +8,7 @@ export interface Priceable {
   id: string;
 }
 
-export const priceableTypes = ['Product', 'ProductFeatureOptions'] as const;
+export const priceableTypes = ['Product', 'ProductFeatureOption'] as const;
 export type PriceableTypes = typeof priceableTypes[number];
 
 @ObjectType()
