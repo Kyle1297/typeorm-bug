@@ -92,14 +92,6 @@ interface ErrorResponse {
   message: String!
 }
 
-type Image {
-  createdAt: DateTime!
-  id: ID!
-  key: String!
-  name: String!
-  updatedAt: DateTime!
-}
-
 type InputError {
   field: String!
   messages: [String!]!
@@ -142,6 +134,54 @@ type Mutation {
   updateCurrentUserPhone(input: UpdateUserPhoneInput!): User!
 }
 
+type Order {
+  confirmedAt: DateTime
+  createdAt: DateTime!
+  currencyCode: String!
+
+  """The timeslot for delivery"""
+  deliverBetween: OrderTimeslotScalar
+  deliveredAt: DateTime
+  deliveryAddress: Address
+  deliveryImages: [OrderImage!]
+  id: ID!
+  notesOnDelivery: String!
+  notesOnPickup: String!
+  onTheWayAt: DateTime
+  orderNumber: String!
+  pickedUpAt: DateTime
+  pickupAddress: Address!
+
+  """The timeslot for pickup"""
+  pickupBetween: OrderTimeslotScalar
+  pickupImages: [OrderImage!]
+  product: Product!
+  readyForDeliveryAt: DateTime
+  readyForDeliveryImages: [OrderImage!]
+
+  """The current status of the order"""
+  status: OrderStatusScalar!
+  updatedAt: DateTime!
+  user: User!
+  washer: Washer
+  washerAssignedAt: DateTime
+}
+
+type OrderImage {
+  createdAt: DateTime!
+  id: ID!
+  key: String!
+  name: String!
+  order: Order!
+  updatedAt: DateTime!
+}
+
+"""Different states of a order"""
+scalar OrderStatusScalar
+
+"""The different timeslots for pickup and delivery"""
+scalar OrderTimeslotScalar
+
 type Price {
   aud_in_cents: Float!
   createdAt: DateTime!
@@ -155,8 +195,9 @@ type Product {
   description: String!
   features: [ProductFeature!]!
   id: ID!
-  image: Image!
+  image: ProductImage!
   name: String!
+  orders: [Order!]!
   price: Price!
   updatedAt: DateTime!
 }
@@ -178,6 +219,14 @@ type ProductFeatureOption {
   name: String!
   price: Price
   productFeature: ProductFeature!
+  updatedAt: DateTime!
+}
+
+type ProductImage {
+  createdAt: DateTime!
+  id: ID!
+  key: String!
+  name: String!
   updatedAt: DateTime!
 }
 
@@ -274,8 +323,27 @@ type User {
   firstName: String!
   id: ID!
   lastName: String!
+  orders: [Order!]!
   phoneCountryCode: String!
   phoneNumber: String!
   socialProviders: [SocialProvider!]!
   updatedAt: DateTime!
 }
+
+type Washer {
+  address: Address!
+  business: Business!
+  createdAt: DateTime!
+  firstAbleToWorkAt: DateTime!
+  id: ID!
+  language: String!
+  lastStatusChangeAt: DateTime!
+  orders: [Order!]!
+
+  """The current status of the washer"""
+  status: WasherStatusScalar!
+  updatedAt: DateTime!
+}
+
+"""Different states of a washer"""
+scalar WasherStatusScalar

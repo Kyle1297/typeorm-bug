@@ -52,6 +52,7 @@
     "graphql-tools": "^7.0.3",
     "nestjs-console": "^4.0.0",
     "next": "^10.1.3",
+    "order-id": "^2.1.2",
     "passport": "^0.4.1",
     "passport-facebook-token": "^4.0.0",
     "passport-google-oauth20": "^2.0.0",
@@ -66,7 +67,8 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
     "typeorm": "^0.2.31",
-    "uuid-with-v6": "^2.0.0"
+    "uuid-with-v6": "^2.0.0",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",
@@ -87,6 +89,7 @@
     "@types/react-dom": "^17.0.3",
     "@types/supertest": "^2.0.10",
     "@types/uuid-with-v6": "^1.1.0",
+    "@types/validator": "^13.7.4",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
     "cypress": "^10.0.3",

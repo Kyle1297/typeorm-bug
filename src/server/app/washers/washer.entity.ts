@@ -6,6 +6,7 @@ import {
   Entity,
   Index,
   JoinColumn,
+  OneToMany,
   OneToOne,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
@@ -17,6 +18,7 @@ import {
 import { Address } from '../addresses/address.entity';
 import { Business } from '../businesses/business.entity';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
+import { Order } from '../orders/order.entity';
 
 @ObjectType()
 @Entity()
@@ -53,6 +55,12 @@ export class Washer extends BaseEntity {
   @OneToOne((_type) => Business)
   @JoinColumn()
   business: Business;
+
+  @Field((_type) => [Order])
+  @OneToMany((_type) => Order, (order) => order.washer, {
+    nullable: false,
+  })
+  orders: Order[];
 
   @BeforeInsert()
   setDefaultLastStatusChangeAt() {

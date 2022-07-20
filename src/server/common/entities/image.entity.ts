@@ -1,11 +1,10 @@
-import { Column, Entity, Index } from 'typeorm';
+import { Column, Index } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { MaxLength } from 'class-validator';
-import { BaseEntity } from 'src/server/common/entities/base.entity';
+import { BaseEntity } from './base.entity';
 
 @ObjectType()
-@Entity()
-export class Image extends BaseEntity {
+export abstract class ImageEntity extends BaseEntity {
   @Field()
   @MaxLength(255)
   @Column({ nullable: false })

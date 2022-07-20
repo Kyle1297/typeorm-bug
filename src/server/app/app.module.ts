@@ -14,8 +14,10 @@ import { WasherModule } from './washers/washer.module';
 import { PriceModule } from './prices/price.module';
 import { ProductModule } from './products/product.module';
 import { ProductFeatureModule } from './product_features/productFeature.module';
-import { ImageModule } from './images/image.module';
+import { ProductImageModule } from './product_images/productImage.module';
 import { ProductFeatureOptionModule } from './product_feature_options/productFeatureOption.module';
+import { OrderImageModule } from './order_images/orderImage.module';
+import { OrderModule } from './orders/order.module';
 
 @Module({
   imports: [
@@ -38,7 +40,9 @@ import { ProductFeatureOptionModule } from './product_feature_options/productFea
     ProductModule,
     ProductFeatureModule,
     ProductFeatureOptionModule,
-    ImageModule,
+    ProductImageModule,
+    OrderImageModule,
+    OrderModule,
   ],
   providers: [SeedService],
 })

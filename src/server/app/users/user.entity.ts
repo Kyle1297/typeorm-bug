@@ -12,6 +12,7 @@ import * as bcrypt from 'bcryptjs';
 import { SocialProvider } from '../auth/auth.entity';
 import { Address } from '../addresses/address.entity';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
+import { Order } from '../orders/order.entity';
 
 @ObjectType()
 @Entity()
@@ -60,6 +61,12 @@ export class User extends BaseEntity {
   @Field((_type) => [Address])
   @OneToMany((_type) => Address, (address) => address.entityId)
   addresses: Address[];
+
+  @Field((_type) => [Order])
+  @OneToMany((_type) => Order, (order) => order.user, {
+    nullable: false,
+  })
+  orders: Order[];
 
   @BeforeInsert()
   async hashPassword() {

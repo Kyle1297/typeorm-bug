@@ -18,7 +18,7 @@ export class Price
   implements PolymorphicChildInterface<PriceableTypes>
 {
   @Field()
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: true })
   isPerBag: boolean;
 
   @Field()
