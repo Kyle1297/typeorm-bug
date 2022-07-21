@@ -1,4 +1,4 @@
-input AddAddressInput {
+input AddUserAddressInput {
   """E.g. leave on porch, call on delivery, security codes on entry, etc."""
   additionalNotes: String = ""
 
@@ -26,37 +26,6 @@ input AddAddressInput {
   type: AddressTypeScalar!
 }
 
-type Address {
-  """E.g. leave on porch, call on delivery, security codes on entry, etc."""
-  additionalNotes: String!
-
-  """State, province or region"""
-  administrativeArea: String!
-  countryCode: String!
-  createdAt: DateTime!
-  id: ID!
-
-  """General instructions for delivery and/or pickup"""
-  instructions: AddressInstructionScalar!
-
-  """Street address line 1"""
-  line1: String!
-
-  """Street address line 2"""
-  line2: String!
-
-  """City or town"""
-  locality: String!
-
-  """Place or business name"""
-  organisationName: String!
-  postalCode: String!
-
-  """Different address types for customers, workers and their businesses"""
-  type: AddressTypeScalar!
-  updatedAt: DateTime!
-}
-
 """General instructions for delivery and/or pickup"""
 scalar AddressInstructionScalar
 
@@ -69,12 +38,31 @@ type AuthUserResponse {
 }
 
 type Business {
-  address: Address!
+  address: BusinessAddress!
   businessNumber: String!
   createdAt: DateTime!
   id: ID!
   isGstRegistered: Boolean!
   name: String!
+  updatedAt: DateTime!
+}
+
+type BusinessAddress {
+  """State, province or region"""
+  administrativeArea: String!
+  countryCode: String!
+  createdAt: DateTime!
+  id: ID!
+
+  """Street address line 1"""
+  line1: String!
+
+  """Street address line 2"""
+  line2: String!
+
+  """City or town"""
+  locality: String!
+  postalCode: String!
   updatedAt: DateTime!
 }
 
@@ -122,16 +110,16 @@ input LoginUserInput {
 union LoginUserResult = AuthUserResponse | InvalidCredentialsError
 
 type Mutation {
-  addAddress(input: AddAddressInput!): Address!
+  addUserAddress(input: AddUserAddressInput!): UserAddress!
   login(input: LoginUserInput!): [LoginUserResult!]!
   loginSocial(input: LoginSocialInput!): [LoginSocialResult!]!
   register(input: RegisterUserInput!): [RegisterUserResult!]!
   registerSocial(input: RegisterSocialInput!): [RegisterSocialResult!]!
-  removeAddress(id: ID!): Address!
   removeCurrentUser: User!
-  updateAddress(id: ID!, input: UpdateAddressInput!): Address!
+  removeUserAddress(id: ID!): UserAddress!
   updateCurrentUserName(input: UpdateUserNameInput!): User!
   updateCurrentUserPhone(input: UpdateUserPhoneInput!): User!
+  updateUserAddress(id: ID!, input: UpdateUserAddressInput!): UserAddress!
 }
 
 type Order {
@@ -142,7 +130,7 @@ type Order {
   """The timeslot for delivery"""
   deliverBetween: OrderTimeslotScalar
   deliveredAt: DateTime
-  deliveryAddress: Address
+  deliveryAddress: OrderAddress
   deliveryImages: [OrderImage!]
   id: ID!
   notesOnDelivery: String!
@@ -150,7 +138,7 @@ type Order {
   onTheWayAt: DateTime
   orderNumber: String!
   pickedUpAt: DateTime
-  pickupAddress: Address!
+  pickupAddress: OrderAddress!
 
   """The timeslot for pickup"""
   pickupBetween: OrderTimeslotScalar
@@ -165,6 +153,34 @@ type Order {
   user: User!
   washer: Washer
   washerAssignedAt: DateTime
+}
+
+type OrderAddress {
+  """E.g. leave on porch, call on delivery, security codes on entry, etc."""
+  additionalNotes: String!
+
+  """State, province or region"""
+  administrativeArea: String!
+  countryCode: String!
+  createdAt: DateTime!
+  id: ID!
+
+  """General instructions for delivery and/or pickup"""
+  instructions: AddressInstructionScalar!
+
+  """Street address line 1"""
+  line1: String!
+
+  """Street address line 2"""
+  line2: String!
+
+  """City or town"""
+  locality: String!
+
+  """Place or business name"""
+  organisationName: String!
+  postalCode: String!
+  updatedAt: DateTime!
 }
 
 type OrderImage {
@@ -182,14 +198,6 @@ scalar OrderStatusScalar
 """The different timeslots for pickup and delivery"""
 scalar OrderTimeslotScalar
 
-type Price {
-  aud_in_cents: Float!
-  createdAt: DateTime!
-  id: ID!
-  isPerBag: Boolean!
-  updatedAt: DateTime!
-}
-
 type Product {
   createdAt: DateTime!
   description: String!
@@ -198,7 +206,7 @@ type Product {
   image: ProductImage!
   name: String!
   orders: [Order!]!
-  price: Price!
+  price: ProductPrice!
   updatedAt: DateTime!
 }
 
@@ -217,8 +225,16 @@ type ProductFeatureOption {
   id: ID!
   isDefault: Boolean!
   name: String!
-  price: Price
+  price: ProductFeatureOptionPrice
   productFeature: ProductFeature!
+  updatedAt: DateTime!
+}
+
+type ProductFeatureOptionPrice {
+  audInCents: Float!
+  createdAt: DateTime!
+  id: ID!
+  isPerBag: Boolean!
   updatedAt: DateTime!
 }
 
@@ -227,6 +243,14 @@ type ProductImage {
   id: ID!
   key: String!
   name: String!
+  updatedAt: DateTime!
+}
+
+type ProductPrice {
+  audInCents: Float!
+  createdAt: DateTime!
+  id: ID!
+  isPerBag: Boolean!
   updatedAt: DateTime!
 }
 
@@ -278,7 +302,7 @@ type SocialProvider {
 """Social provider type such as facebook or google"""
 scalar SocialProviderScalar
 
-input UpdateAddressInput {
+input UpdateUserAddressInput {
   """E.g. leave on porch, call on delivery, security codes on entry, etc."""
   additionalNotes: String
 
@@ -317,7 +341,7 @@ input UpdateUserPhoneInput {
 }
 
 type User {
-  addresses: [Address!]!
+  addresses: [UserAddress!]!
   createdAt: DateTime!
   email: String!
   firstName: String!
@@ -330,8 +354,40 @@ type User {
   updatedAt: DateTime!
 }
 
+type UserAddress {
+  """E.g. leave on porch, call on delivery, security codes on entry, etc."""
+  additionalNotes: String!
+
+  """State, province or region"""
+  administrativeArea: String!
+  countryCode: String!
+  createdAt: DateTime!
+  id: ID!
+
+  """General instructions for delivery and/or pickup"""
+  instructions: AddressInstructionScalar!
+
+  """Street address line 1"""
+  line1: String!
+
+  """Street address line 2"""
+  line2: String!
+
+  """City or town"""
+  locality: String!
+
+  """Place or business name"""
+  organisationName: String!
+  postalCode: String!
+
+  """Different address types for customers, workers and their businesses"""
+  type: AddressTypeScalar!
+  updatedAt: DateTime!
+  user: User!
+}
+
 type Washer {
-  address: Address!
+  address: WasherAddress!
   business: Business!
   createdAt: DateTime!
   firstAbleToWorkAt: DateTime!
@@ -342,6 +398,28 @@ type Washer {
 
   """The current status of the washer"""
   status: WasherStatusScalar!
+  updatedAt: DateTime!
+}
+
+type WasherAddress {
+  """State, province or region"""
+  administrativeArea: String!
+  countryCode: String!
+  createdAt: DateTime!
+  id: ID!
+
+  """Street address line 1"""
+  line1: String!
+
+  """Street address line 2"""
+  line2: String!
+
+  """City or town"""
+  locality: String!
+
+  """Place or business name"""
+  organisationName: String!
+  postalCode: String!
   updatedAt: DateTime!
 }
 

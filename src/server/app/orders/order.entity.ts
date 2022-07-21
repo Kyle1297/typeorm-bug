@@ -11,19 +11,22 @@ import {
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { IsDate, IsOptional, MaxLength } from 'class-validator';
-import { OrderStatuses, OrderStatusScalar } from './scalars/OrderStatusScalar';
-import { Address } from '../addresses/address.entity';
+import {
+  OrderStatuses,
+  OrderStatusScalar,
+} from './scalars/order_status.scalar';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
 import orderId from 'order-id';
 import {
   OrderTimeslots,
   OrderTimeslotScalar,
-} from './scalars/OrderTimeslotScalar';
+} from './scalars/order_timeslot.scalar';
 import { IsISO4217 } from 'src/server/common/decorators/IsISO4217';
 import { Product } from '../products/product.entity';
 import { User } from '../users/user.entity';
 import { Washer } from '../washers/washer.entity';
-import { OrderImage } from '../order_images/orderImage.entity';
+import { OrderImage } from '../order_images/order_image.entity';
+import { OrderAddress } from '../order_addresses/order_address.entity';
 
 const ORDER_ID_SEED_PHRASE = 'order-id-seed-phrase';
 
@@ -105,19 +108,19 @@ export class Order extends BaseEntity {
   @Column('text', { nullable: false, default: '' })
   notesOnDelivery?: string;
 
-  @Field((_type) => Address)
-  @OneToOne((_type) => Address, (address) => address.entityId, {
+  @Field((_type) => OrderAddress)
+  @OneToOne((_type) => OrderAddress, {
     nullable: true,
   })
   @JoinColumn()
-  pickupAddress?: Address;
+  pickupAddress?: OrderAddress;
 
-  @Field((_type) => Address, { nullable: true })
-  @OneToOne((_type) => Address, (address) => address.entityId, {
+  @Field((_type) => OrderAddress, { nullable: true })
+  @OneToOne((_type) => OrderAddress, {
     nullable: true,
   })
   @JoinColumn()
-  deliveryAddress?: Address;
+  deliveryAddress?: OrderAddress;
 
   @Field((_type) => Product)
   @ManyToOne((_type) => Product, (product) => product.orders, {

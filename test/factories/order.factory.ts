@@ -1,9 +1,9 @@
 import * as faker from 'faker';
 import { FactoryBuilder } from 'factory.io';
 import { Order } from 'src/server/app/orders/order.entity';
-import { orderTimeslots } from 'src/server/app/orders/scalars/OrderTimeslotScalar';
+import { orderTimeslots } from 'src/server/app/orders/scalars/order_timeslot.scalar';
 import { addressFactory } from './address.factory';
-import { orderStatuses } from 'src/server/app/orders/scalars/OrderStatusScalar';
+import { orderStatuses } from 'src/server/app/orders/scalars/order_status.scalar';
 
 export const orderFactory = FactoryBuilder.of(Order)
   .props({

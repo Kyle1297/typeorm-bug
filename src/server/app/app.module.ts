@@ -8,17 +8,20 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/user.module';
 import { GraphqlConfigService } from '../config/graphql.config';
 import { TypeOrmConfigService } from '../config/typeorm.config';
-import { AddressModule } from './addresses/address.module';
 import { BusinessModule } from './businesses/business.module';
 import { WasherModule } from './washers/washer.module';
-import { PriceModule } from './prices/price.module';
 import { ProductModule } from './products/product.module';
-import { ProductFeatureModule } from './product_features/productFeature.module';
-import { ProductImageModule } from './product_images/productImage.module';
-import { ProductFeatureOptionModule } from './product_feature_options/productFeatureOption.module';
-import { OrderImageModule } from './order_images/orderImage.module';
+import { ProductFeatureModule } from './product_features/product_feature.module';
+import { ProductImageModule } from './product_images/product_image.module';
+import { ProductFeatureOptionModule } from './product_feature_options/product_feature_option.module';
+import { OrderImageModule } from './order_images/order_image.module';
 import { OrderModule } from './orders/order.module';
-
+import { ProductPriceModule } from './product_prices/product_price.module';
+import { ProductFeatureOptionPriceModule } from './product_feature_option_prices/product_feature_option_price.module';
+import { WasherAddressModule } from './washer_addresses/washer_address.module';
+import { BusinessAddressModule } from './business_addresses/business_address.module';
+import { OrderAddressModule } from './order_addresses/order_address.module';
+import { UserAddressModule } from './user_addresses/user_address.module';
 @Module({
   imports: [
     GraphQLModule.forRootAsync({
@@ -33,16 +36,20 @@ import { OrderModule } from './orders/order.module';
     ConsoleModule,
     UserModule,
     AuthModule,
-    AddressModule,
     BusinessModule,
     WasherModule,
-    PriceModule,
     ProductModule,
     ProductFeatureModule,
     ProductFeatureOptionModule,
     ProductImageModule,
     OrderImageModule,
     OrderModule,
+    ProductPriceModule,
+    ProductFeatureOptionPriceModule,
+    UserAddressModule,
+    OrderAddressModule,
+    BusinessAddressModule,
+    WasherAddressModule,
   ],
   providers: [SeedService],
 })

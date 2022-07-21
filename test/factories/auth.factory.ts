@@ -4,11 +4,11 @@ import * as faker from 'faker';
 import { FactoryBuilder } from 'factory.io';
 import jwtConfig from 'src/server/config/jwt.config';
 import { User } from 'src/server/app/users/user.entity';
-import { LoginSocialInput } from 'src/server/app/auth/inputs/login-social.input';
+import { LoginSocialInput } from 'src/server/app/auth/inputs/login_social.input';
 import { SocialProvider } from 'src/server/app/auth/auth.entity';
-import { RegisterSocialInput } from 'src/server/app/auth/inputs/register-social.input';
+import { RegisterSocialInput } from 'src/server/app/auth/inputs/register_social.input';
 import { userFactory } from './user.factory';
-import { socialProviderTypes } from 'src/server/app/auth/scalars/SocialProviderScalar';
+import { socialProviderTypes } from 'src/server/app/auth/scalars/social_provider.scalar';
 
 const config = jwtConfig();
 const jwtService = new JwtService({

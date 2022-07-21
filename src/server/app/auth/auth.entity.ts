@@ -4,7 +4,7 @@ import { User } from '../users/user.entity';
 import {
   SocialProviderScalar,
   SocialProviderTypes,
-} from './scalars/SocialProviderScalar';
+} from './scalars/social_provider.scalar';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
 
 @ObjectType()

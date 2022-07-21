@@ -1,7 +1,7 @@
 import * as faker from 'faker';
 import { FactoryBuilder } from 'factory.io';
-import { ProductImage } from 'src/server/app/product_images/productImage.entity';
-import { OrderImage } from 'src/server/app/order_images/orderImage.entity';
+import { ProductImage } from 'src/server/app/product_images/product_image.entity';
+import { OrderImage } from 'src/server/app/order_images/order_image.entity';
 
 export const productImageFactory = FactoryBuilder.of(ProductImage)
   .props({

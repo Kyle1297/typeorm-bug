@@ -1,19 +1,19 @@
 import { Mutation, Resolver } from '@nestjs/graphql';
-import { LoginUserInput } from './inputs/login-user.input';
+import { LoginUserInput } from './inputs/login_user.input';
 import { AuthService } from './auth.service';
-import { RegisterUserInput } from './inputs/register-user.input';
+import { RegisterUserInput } from './inputs/register_user.input';
 import { UseGuards } from '@nestjs/common';
-import { RegisterUserResultUnion } from './results/register-user.result';
-import { LoginUserResultUnion } from './results/login-user.result';
+import { RegisterUserResultUnion } from './results/register_user.result';
+import { LoginUserResultUnion } from './results/login_user.result';
 import { Profile } from 'passport';
-import { RegisterSocialInput } from './inputs/register-social.input';
-import { LoginSocialInput } from './inputs/login-social.input';
+import { RegisterSocialInput } from './inputs/register_social.input';
+import { LoginSocialInput } from './inputs/login_social.input';
 import { Input } from '../graphql/args/input.args';
-import { LoginSocialResultUnion } from './results/login-social.result';
-import { RegisterSocialResultUnion } from './results/register-social.result';
-import { SocialAuthGuard } from 'src/server/common/guards/social-auth.guard';
-import { SocialProfile } from 'src/server/common/decorators/social-profile.decorator';
-import { ValidateInput } from 'src/server/common/decorators/validate-input.decorator';
+import { LoginSocialResultUnion } from './results/login_social.result';
+import { RegisterSocialResultUnion } from './results/register_social.result';
+import { SocialAuthGuard } from 'src/server/common/guards/social_auth.guard';
+import { SocialProfile } from 'src/server/common/decorators/social_profile.decorator';
+import { ValidateInput } from 'src/server/common/decorators/validate_input.decorator';
 
 @Resolver()
 export class AuthResolver {

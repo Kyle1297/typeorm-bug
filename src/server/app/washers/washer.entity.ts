@@ -14,11 +14,11 @@ import { IsDate, IsLocale, IsOptional } from 'class-validator';
 import {
   WasherStatuses,
   WasherStatusScalar,
-} from './scalars/WasherStatusScalar';
-import { Address } from '../addresses/address.entity';
+} from './scalars/washer_status.scalar';
 import { Business } from '../businesses/business.entity';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
 import { Order } from '../orders/order.entity';
+import { WasherAddress } from '../washer_addresses/washer_address.entity';
 
 @ObjectType()
 @Entity()
@@ -46,10 +46,10 @@ export class Washer extends BaseEntity {
   @Column({ nullable: false, default: 'en-US' })
   language: string;
 
-  @Field((_type) => Address)
-  @OneToOne((_type) => Address, (address) => address.entityId)
+  @Field((_type) => WasherAddress)
+  @OneToOne((_type) => WasherAddress)
   @JoinColumn()
-  address: Address;
+  address: WasherAddress;
 
   @Field((_type) => Business)
   @OneToOne((_type) => Business)

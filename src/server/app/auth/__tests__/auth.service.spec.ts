@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { SocialProviderRepository } from '../auth.repository';
-import { CredentialsTakenError } from '../responses/credentials-taken.error';
-import { SocialAlreadyAssignedError } from '../responses/social-already-assigned.error';
+import { CredentialsTakenError } from '../responses/credentials_taken.error';
+import { SocialAlreadyAssignedError } from '../responses/social_already_assigned.error';
 import { UserService } from '../../users/user.service';
 import { UserRepository } from '../../users/user.repository';
 import {

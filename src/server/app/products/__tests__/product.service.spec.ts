@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { priceFactory } from 'test/factories/price.factory';
+import { productPriceFactory } from 'test/factories/price.factory';
 import { productFactory } from 'test/factories/product.factory';
 import { ProductRepository } from '../product.repository';
 import { ProductService } from '../product.service';
@@ -20,7 +20,7 @@ describe('ProductService', () => {
   describe('findOne', () => {
     it('should return product with given id', async () => {
       const product = productFactory.buildOne({
-        price: priceFactory.buildOne(),
+        price: productPriceFactory.buildOne(),
       });
       jest
         .spyOn(productRepository, 'findOneWithImagePricesAndFeatures')

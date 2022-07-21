@@ -4,7 +4,7 @@
     "../"
   ],
   "testEnvironment": "node",
-  "testRegex": ".request-spec.ts$",
+  "testRegex": ".request_spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   }

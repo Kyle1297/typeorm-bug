@@ -10,9 +10,9 @@ import {
 } from 'class-validator';
 import * as bcrypt from 'bcryptjs';
 import { SocialProvider } from '../auth/auth.entity';
-import { Address } from '../addresses/address.entity';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
 import { Order } from '../orders/order.entity';
+import { UserAddress } from '../user_addresses/user_address.entity';
 
 @ObjectType()
 @Entity()
@@ -58,9 +58,11 @@ export class User extends BaseEntity {
   )
   socialProviders: SocialProvider[];
 
-  @Field((_type) => [Address])
-  @OneToMany((_type) => Address, (address) => address.entityId)
-  addresses: Address[];
+  @Field((_type) => [UserAddress])
+  @OneToMany((_type) => UserAddress, (userAddress) => userAddress.user, {
+    nullable: false,
+  })
+  addresses: UserAddress[];
 
   @Field((_type) => [Order])
   @OneToMany((_type) => Order, (order) => order.user, {

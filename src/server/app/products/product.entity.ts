@@ -9,11 +9,11 @@ import {
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { MaxLength } from 'class-validator';
-import { Price } from '../prices/price.entity';
-import { ProductImage } from '../product_images/productImage.entity';
+import { ProductImage } from '../product_images/product_image.entity';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
-import { ProductFeature } from '../product_features/productFeature.entity';
+import { ProductFeature } from '../product_features/product_feature.entity';
 import { Order } from '../orders/order.entity';
+import { ProductPrice } from '../product_prices/product_price.entity';
 
 @ObjectType()
 @Entity()
@@ -33,10 +33,10 @@ export class Product extends BaseEntity {
   @JoinColumn()
   image: ProductImage;
 
-  @Field((_type) => Price)
-  @OneToOne((_type) => Price, (price) => price.entityId)
+  @Field((_type) => ProductPrice)
+  @OneToOne((_type) => ProductPrice)
   @JoinColumn()
-  price: Price;
+  price: ProductPrice;
 
   @Field((_type) => [ProductFeature])
   @ManyToMany(() => ProductFeature)

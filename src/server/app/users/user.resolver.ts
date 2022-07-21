@@ -2,13 +2,13 @@ import { Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './user.entity';
 import { UseGuards } from '@nestjs/common';
-import { JwtGqlAuthGuard } from 'src/server/common/guards/jwt-gql-auth.guard';
-import { GqlUser } from 'src/server/common/decorators/gql-user.decorator';
+import { JwtGqlAuthGuard } from 'src/server/common/guards/jwt_gql_auth.guard';
+import { GqlUser } from 'src/server/common/decorators/gql_user.decorator';
 import { Input } from '../graphql/args/input.args';
 import {
   UpdateUserNameInput,
   UpdateUserPhoneInput,
-} from './input/update-user.input';
+} from './input/update_user.input';
 
 @Resolver()
 export class UserResolver {

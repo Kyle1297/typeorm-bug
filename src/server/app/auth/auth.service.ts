@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthUserResponse } from './responses/auth-user.response';
-import { RegisterUserInput } from './inputs/register-user.input';
+import { AuthUserResponse } from './responses/auth_user.response';
+import { RegisterUserInput } from './inputs/register_user.input';
 import { Profile } from 'passport';
 import { SocialProviderRepository } from './auth.repository';
-import { CredentialsTakenError } from './responses/credentials-taken.error';
-import { InvalidCredentialsError } from './responses/invalid-credentials.error';
-import { SocialAlreadyAssignedError } from './responses/social-already-assigned.error';
-import { SocialNotRegisteredError } from './responses/social-not-registered.error';
+import { CredentialsTakenError } from './responses/credentials_taken.error';
+import { InvalidCredentialsError } from './responses/invalid_credentials.error';
+import { SocialAlreadyAssignedError } from './responses/social_already_assigned.error';
+import { SocialNotRegisteredError } from './responses/social_not_registered.error';
 import { UserService } from '../users/user.service';
 import { User } from '../users/user.entity';
 import { either, Either } from 'src/server/common/utils/either';
-import { RegisterSocialInput } from './inputs/register-social.input';
-import { SocialProviderTypes } from './scalars/SocialProviderScalar';
+import { RegisterSocialInput } from './inputs/register_social.input';
+import { SocialProviderTypes } from './scalars/social_provider.scalar';
 
 @Injectable()
 export class AuthService {

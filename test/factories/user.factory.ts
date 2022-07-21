@@ -1,7 +1,7 @@
 import * as faker from 'faker';
 import { FactoryBuilder } from 'factory.io';
-import { LoginUserInput } from 'src/server/app/auth/inputs/login-user.input';
-import { RegisterUserInput } from 'src/server/app/auth/inputs/register-user.input';
+import { LoginUserInput } from 'src/server/app/auth/inputs/login_user.input';
+import { RegisterUserInput } from 'src/server/app/auth/inputs/register_user.input';
 import { User } from 'src/server/app/users/user.entity';
 
 export const loginUserInputFactory = FactoryBuilder.of(LoginUserInput)

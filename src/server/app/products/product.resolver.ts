@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, ID, Query, Resolver } from '@nestjs/graphql';
-import { JwtGqlAuthGuard } from 'src/server/common/guards/jwt-gql-auth.guard';
+import { JwtGqlAuthGuard } from 'src/server/common/guards/jwt_gql_auth.guard';
 import { Product } from './product.entity';
 import { ProductService } from './product.service';
 

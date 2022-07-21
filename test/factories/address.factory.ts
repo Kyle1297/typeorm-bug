@@ -1,48 +1,76 @@
 import * as faker from 'faker';
 import { FactoryBuilder } from 'factory.io';
-import { Address } from 'src/server/app/addresses/address.entity';
-import { AddAddressInput } from 'src/server/app/addresses/input/add-address.input';
-import { addressTypes } from 'src/server/app/addresses/scalars/AddressTypeScalar';
-import { addressInstructions } from 'src/server/app/addresses/scalars/AddressInstructionScalar';
-import { UpdateAddressInput } from 'src/server/app/addresses/input/update-address.input';
+import { AddUserAddressInput } from 'src/server/app/user_addresses/input/add_user_address.input';
+import { addressInstructions } from 'src/server/common/scalars/address_instruction.scalar';
+import { addressTypes } from 'src/server/app/user_addresses/scalars/address_type.scalar';
+import { UpdateUserAddressInput } from 'src/server/app/user_addresses/input/update_user_address.input';
+import { UserAddress } from 'src/server/app/user_addresses/user_address.entity';
+import { BusinessAddress } from 'src/server/app/business_addresses/business_address.entity';
+import { WasherAddress } from 'src/server/app/washer_addresses/washer_address.entity';
+import { OrderAddress } from 'src/server/app/order_addresses/order_address.entity';
 
-export const addAddressInputFactory = FactoryBuilder.of(AddAddressInput)
+const addressFactory = FactoryBuilder.of(UserAddress)
   .props({
-    organisationName: faker.company.companyName(),
     line1: faker.address.streetAddress(),
     line2: faker.address.secondaryAddress(),
     locality: faker.address.city(),
     administrativeArea: faker.address.state(),
     postalCode: faker.address.zipCode(),
     countryCode: faker.address.countryCode(),
-    instructions: faker.random.arrayElement(addressInstructions),
-    additionalNotes: faker.lorem.sentence(),
-    type: faker.random.arrayElement(addressTypes),
   })
   .build();
 
-export const updateAddressInputFactory = FactoryBuilder.of(UpdateAddressInput)
+export const addUserAddressInputFactory = FactoryBuilder.of(AddUserAddressInput)
   .props({
     organisationName: faker.company.companyName(),
-    line1: faker.address.streetAddress(),
-    line2: faker.address.secondaryAddress(),
-    locality: faker.address.city(),
-    administrativeArea: faker.address.state(),
-    postalCode: faker.address.zipCode(),
-    countryCode: faker.address.countryCode(),
     instructions: faker.random.arrayElement(addressInstructions),
     additionalNotes: faker.lorem.sentence(),
     type: faker.random.arrayElement(addressTypes),
   })
+  .mixins([addressFactory])
   .build();
 
-export const addressFactory = FactoryBuilder.of(Address)
+export const updateUserAddressInputFactory = FactoryBuilder.of(
+  UpdateUserAddressInput,
+)
+  .mixins([addUserAddressInputFactory])
+  .build();
+
+export const userAddressFactory = FactoryBuilder.of(UserAddress)
   .props({
     id: faker.datatype.uuid(),
-    entityId: faker.datatype.uuid(),
-    entityType: 'User',
+    user: null,
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
   })
-  .mixins([addAddressInputFactory])
+  .mixins([addUserAddressInputFactory])
+  .build();
+
+export const businessAddressFactory = FactoryBuilder.of(BusinessAddress)
+  .props({
+    id: faker.datatype.uuid(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+  })
+  .mixins([addressFactory])
+  .build();
+
+export const washerAddressFactory = FactoryBuilder.of(WasherAddress)
+  .props({
+    id: faker.datatype.uuid(),
+    organisationName: faker.company.companyName(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+  })
+  .mixins([addressFactory])
+  .build();
+
+export const orderAddressFactory = FactoryBuilder.of(OrderAddress)
+  .props({
+    id: faker.datatype.uuid(),
+    organisationName: faker.company.companyName(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+  })
+  .mixins([addressFactory])
   .build();
