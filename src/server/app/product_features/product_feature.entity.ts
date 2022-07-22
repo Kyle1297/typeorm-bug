@@ -9,13 +9,17 @@ import { ProductFeatureOption } from '../product_feature_options/product_feature
 export class ProductFeature extends BaseEntity {
   @Field()
   @MaxLength(255)
-  @Column({ nullable: false })
+  @Column({ nullable: false, update: false })
   name: string;
 
   @Field({ defaultValue: '' })
   @MaxLength(1200)
   @Column('text', { nullable: false, default: '' })
   description: string;
+
+  @Field()
+  @Column({ nullable: false, default: true })
+  isAvailable: boolean;
 
   @Field((_type) => [ProductFeatureOption])
   @OneToMany(

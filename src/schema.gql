@@ -123,6 +123,10 @@ type Mutation {
 }
 
 type Order {
+  additionalChargeReason: String!
+  additionalChargesInCents: Float!
+  cancellationReason: String!
+  cancelledAt: DateTime
   confirmedAt: DateTime
   createdAt: DateTime!
   currencyCode: String!
@@ -133,6 +137,7 @@ type Order {
   deliveryAddress: OrderAddress
   deliveryImages: [OrderImage!]
   id: ID!
+  isCancelled: Boolean!
   notesOnDelivery: String!
   notesOnPickup: String!
   onTheWayAt: DateTime

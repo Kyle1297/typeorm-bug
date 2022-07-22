@@ -4,6 +4,6 @@ import { ProductFeatureOptionRepository } from './product_feature_option.reposit
 @Injectable()
 export class ProductFeatureOptionService {
   constructor(
-    private readonly productfeatureoptionRepository: ProductFeatureOptionRepository,
+    private readonly productFeatureOptionRepository: ProductFeatureOptionRepository,
   ) {}
 }

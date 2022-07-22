@@ -12,15 +12,15 @@ import { validateOrReject } from 'class-validator';
 @ObjectType()
 export abstract class BaseEntity {
   @Field((_type) => ID)
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('uuid', { update: false, nullable: false })
   id: string;
 
   @Field()
-  @CreateDateColumn()
+  @CreateDateColumn({ update: false, nullable: false })
   createdAt: Date;
 
   @Field()
-  @UpdateDateColumn()
+  @UpdateDateColumn({ nullable: false })
   updatedAt: Date;
 
   @BeforeInsert()

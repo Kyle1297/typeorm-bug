@@ -12,8 +12,7 @@ import { MaxLength } from 'class-validator';
 import { ProductImage } from '../product_images/product_image.entity';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
 import { ProductFeature } from '../product_features/product_feature.entity';
-import { Order } from '../orders/order.entity';
-import { ProductPrice } from '../product_prices/product_price.entity';
+import { ProductVersion } from '../product_versions/product_version.entity';
 
 @ObjectType()
 @Entity()
@@ -28,24 +27,27 @@ export class Product extends BaseEntity {
   @Column('text', { nullable: false })
   description: string;
 
+  @Field()
+  @Column({ nullable: false, default: true })
+  isAvailable: boolean;
+
   @Field((_type) => ProductImage)
   @OneToOne((_type) => ProductImage)
   @JoinColumn()
   image: ProductImage;
-
-  @Field((_type) => ProductPrice)
-  @OneToOne((_type) => ProductPrice)
-  @JoinColumn()
-  price: ProductPrice;
 
   @Field((_type) => [ProductFeature])
   @ManyToMany(() => ProductFeature)
   @JoinTable()
   features: ProductFeature[];
 
-  @Field((_type) => [Order])
-  @OneToMany((_type) => Order, (order) => order.product, {
-    nullable: false,
-  })
-  orders: Order[];
+  @Field((_type) => ProductVersion)
+  @OneToMany(
+    (_type) => ProductVersion,
+    (productVersion) => productVersion.product,
+    {
+      nullable: false,
+    },
+  )
+  versions: ProductVersion[];
 }

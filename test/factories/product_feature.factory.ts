@@ -7,6 +7,7 @@ export const productFeatureFactory = FactoryBuilder.of(ProductFeature)
     id: faker.datatype.uuid(),
     name: faker.commerce.productName(),
     description: faker.lorem.text(),
+    isAvailable: faker.datatype.boolean(),
     options: [],
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),

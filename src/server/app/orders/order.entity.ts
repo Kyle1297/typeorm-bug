@@ -10,7 +10,7 @@ import {
   OneToOne,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { IsDate, IsOptional, MaxLength } from 'class-validator';
+import { IsDate, IsOptional, MaxLength, Min } from 'class-validator';
 import {
   OrderStatuses,
   OrderStatusScalar,
@@ -22,11 +22,12 @@ import {
   OrderTimeslotScalar,
 } from './scalars/order_timeslot.scalar';
 import { IsISO4217 } from 'src/server/common/decorators/IsISO4217';
-import { Product } from '../products/product.entity';
+import { ProductVersion } from '../product_versions/product_version.entity';
 import { User } from '../users/user.entity';
 import { Washer } from '../washers/washer.entity';
 import { OrderImage } from '../order_images/order_image.entity';
 import { OrderAddress } from '../order_addresses/order_address.entity';
+import { OrderItem } from '../order_items/order_items.entity';
 
 const ORDER_ID_SEED_PHRASE = 'order-id-seed-phrase';
 
@@ -101,12 +102,12 @@ export class Order extends BaseEntity {
   @Field()
   @MaxLength(1200)
   @Column('text', { nullable: false, default: '' })
-  notesOnPickup?: string;
+  washerNotesOnPickup?: string;
 
   @Field()
   @MaxLength(1200)
   @Column('text', { nullable: false, default: '' })
-  notesOnDelivery?: string;
+  washerNotesOnDelivery?: string;
 
   @Field((_type) => OrderAddress)
   @OneToOne((_type) => OrderAddress, {
@@ -122,11 +123,15 @@ export class Order extends BaseEntity {
   @JoinColumn()
   deliveryAddress?: OrderAddress;
 
-  @Field((_type) => Product)
-  @ManyToOne((_type) => Product, (product) => product.orders, {
-    nullable: false,
-  })
-  product: Product;
+  @Field((_type) => ProductVersion)
+  @ManyToOne(
+    (_type) => ProductVersion,
+    (productVersion) => productVersion.orders,
+    {
+      nullable: false,
+    },
+  )
+  productVersion: ProductVersion;
 
   @Field((_type) => User)
   @ManyToOne((_type) => User, (user) => user.orders, {
@@ -139,6 +144,12 @@ export class Order extends BaseEntity {
     nullable: true,
   })
   washer?: Washer;
+
+  @Field((_type) => [OrderItem])
+  @OneToMany((_type) => OrderItem, (orderItem) => orderItem.order, {
+    nullable: false,
+  })
+  items: OrderItem[];
 
   @Field((_type) => [OrderImage], { nullable: true })
   @OneToMany((_type) => OrderImage, (orderImage) => orderImage.order, {
@@ -158,9 +169,53 @@ export class Order extends BaseEntity {
   })
   deliveryImages?: OrderImage[];
 
+  @Field()
+  @Column('integer', { nullable: false, default: 0 })
+  @Min(0)
+  additionalChargesInCents: number;
+
+  @Field()
+  @MaxLength(1200)
+  @Column('text', { nullable: false, default: '' })
+  additionalChargeReason: string;
+
+  @Field()
+  @Column({ nullable: false, default: false })
+  isCancelled: boolean;
+
+  @Field()
+  @MaxLength(1200)
+  @Column('text', { nullable: false, default: '' })
+  cancellationReason: string;
+
+  @Field({ nullable: true })
+  @IsDate()
+  @IsOptional()
+  @Column({ nullable: true })
+  cancelledAt?: Date;
+
   @BeforeInsert()
   setOrderNumber() {
     this.orderNumber = orderId(ORDER_ID_SEED_PHRASE).generate();
+  }
+
+  private previousIsCancelled: boolean;
+
+  @AfterLoad()
+  setPreviousIsCancelled() {
+    this.previousIsCancelled = this.isCancelled;
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  setIsCancelled() {
+    if (this.isCancelled !== this.previousIsCancelled) {
+      if (this.isCancelled) {
+        this.cancelledAt = new Date();
+      } else {
+        this.cancelledAt = null;
+      }
+    }
   }
 
   private previousWasher: Washer | undefined;
@@ -210,6 +265,38 @@ export class Order extends BaseEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
+  validateCancellation() {
+    if (this.isCancelled && (!this.cancellationReason || !this.cancelledAt)) {
+      throw new Error(
+        'Cancellation reason and cancelled at date must be set when order is cancelled',
+      );
+    }
+
+    if (!this.isCancelled && (this.cancellationReason || this.cancelledAt)) {
+      throw new Error(
+        'Cancellation reason and cancelled at date should not be set if order has not been cancelled',
+      );
+    }
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  validateAdditionalCharges() {
+    if (this.additionalChargesInCents > 0 && !this.additionalChargeReason) {
+      throw new Error(
+        'An additional charge reason is required when there are additional charges',
+      );
+    }
+
+    if (this.additionalChargesInCents === 0 && this.additionalChargeReason) {
+      throw new Error(
+        'An additional charge reason is not required when there are no additional charges',
+      );
+    }
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
   validateUnconfirmedStatus() {
     if (this.status === 'NOT_CONFIRMED') {
       if (this.confirmedAt) {
@@ -247,12 +334,12 @@ export class Order extends BaseEntity {
           'Order cannot have a washer if it has not been confirmed',
         );
       }
-      if (this.notesOnPickup) {
+      if (this.washerNotesOnPickup) {
         throw new Error(
           'Order cannot have notes on pickup if it has not been confirmed',
         );
       }
-      if (this.notesOnDelivery) {
+      if (this.washerNotesOnDelivery) {
         throw new Error(
           'Order cannot have notes on delivery if it has not been confirmed',
         );
@@ -270,6 +357,16 @@ export class Order extends BaseEntity {
       if (this.deliveryImages) {
         throw new Error(
           'Order cannot have delivery images if it has not been confirmed',
+        );
+      }
+      if (this.additionalChargesInCents > 0) {
+        throw new Error(
+          'Order cannot have additional charges if it has not been confirmed',
+        );
+      }
+      if (this.additionalChargeReason) {
+        throw new Error(
+          'Order cannot have an additional charge reason if it has not been confirmed',
         );
       }
     }
@@ -326,12 +423,12 @@ export class Order extends BaseEntity {
       if (!this.deliverBetween) {
         throw new Error('Order must have a delivery time if it is confirmed');
       }
-      if (this.notesOnPickup) {
+      if (this.washerNotesOnPickup) {
         throw new Error(
           'Order cannot have notes on pickup if it has only been confirmed',
         );
       }
-      if (this.notesOnDelivery) {
+      if (this.washerNotesOnDelivery) {
         throw new Error(
           'Order cannot have notes on delivery if it has only been confirmed',
         );
@@ -413,12 +510,12 @@ export class Order extends BaseEntity {
           "Order must have a delivery time if it's washer has been assigned",
         );
       }
-      if (this.notesOnPickup) {
+      if (this.washerNotesOnPickup) {
         throw new Error(
           "Order cannot have notes on pickup if it's washer has only been assigned",
         );
       }
-      if (this.notesOnDelivery) {
+      if (this.washerNotesOnDelivery) {
         throw new Error(
           "Order cannot have notes on delivery if it's washer has only been assigned",
         );
@@ -498,7 +595,7 @@ export class Order extends BaseEntity {
           'Order must have a delivery time if it has been picked up',
         );
       }
-      if (this.notesOnDelivery) {
+      if (this.washerNotesOnDelivery) {
         throw new Error(
           'Order cannot have notes on delivery if it has only been picked up',
         );
@@ -573,7 +670,7 @@ export class Order extends BaseEntity {
           'Order must have a delivery time if it is ready for delivery',
         );
       }
-      if (this.notesOnDelivery) {
+      if (this.washerNotesOnDelivery) {
         throw new Error(
           'Order cannot have notes on delivery if it is ready for delivery',
         );
@@ -640,7 +737,7 @@ export class Order extends BaseEntity {
       if (!this.deliverBetween) {
         throw new Error('Order must have a delivery time if it is on the way');
       }
-      if (this.notesOnDelivery) {
+      if (this.washerNotesOnDelivery) {
         throw new Error(
           'Order cannot have notes on delivery if it is on the way',
         );

@@ -1,23 +1,16 @@
-import {
-  Column,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { MaxLength } from 'class-validator';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
 import { ProductFeature } from '../product_features/product_feature.entity';
-import { ProductFeatureOptionPrice } from '../product_feature_option_prices/product_feature_option_price.entity';
+import { ProductFeatureOptionVersion } from '../product_feature_option_versions/product_feature_option_version.entity';
 
 @ObjectType()
 @Entity()
 export class ProductFeatureOption extends BaseEntity {
   @Field()
   @MaxLength(255)
-  @Column({ nullable: false })
+  @Column({ nullable: false, update: false })
   name: string;
 
   @Field({ defaultValue: '' })
@@ -26,9 +19,12 @@ export class ProductFeatureOption extends BaseEntity {
   description: string;
 
   @Field({ defaultValue: false })
-  @Index()
   @Column({ nullable: false, default: false })
   isDefault: boolean;
+
+  @Field()
+  @Column({ nullable: false, default: true })
+  isAvailable: boolean;
 
   @Field((_type) => ProductFeature)
   @ManyToOne(
@@ -40,10 +36,14 @@ export class ProductFeatureOption extends BaseEntity {
   )
   productFeature: ProductFeature;
 
-  @Field((_type) => ProductFeatureOptionPrice, { nullable: true })
-  @OneToOne((_type) => ProductFeatureOptionPrice, {
-    nullable: true,
-  })
-  @JoinColumn()
-  price?: ProductFeatureOptionPrice;
+  @Field((_type) => ProductFeatureOptionVersion)
+  @OneToMany(
+    (_type) => ProductFeatureOptionVersion,
+    (productFeatureOptionVersion) =>
+      productFeatureOptionVersion.productFeatureOption,
+    {
+      nullable: false,
+    },
+  )
+  versions: ProductFeatureOptionVersion[];
 }
