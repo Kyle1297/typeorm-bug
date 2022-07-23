@@ -24,6 +24,9 @@ import { OrderAddressModule } from './order_addresses/order_address.module';
 import { UserAddressModule } from './user_addresses/user_address.module';
 import { ProductModule } from './products/product.module';
 import { ProductFeatureOptionVersionModule } from './product_feature_option_versions/product_feature_option_version.module';
+import { OrderItemModule } from './order_items/order_items.module';
+import '../common/decorators/VirtualColumn/polyfill';
+
 @Module({
   imports: [
     GraphQLModule.forRootAsync({
@@ -48,6 +51,7 @@ import { ProductFeatureOptionVersionModule } from './product_feature_option_vers
     ProductImageModule,
     OrderImageModule,
     OrderModule,
+    OrderItemModule,
     ProductPriceModule,
     ProductFeatureOptionPriceModule,
     UserAddressModule,

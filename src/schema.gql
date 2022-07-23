@@ -138,8 +138,7 @@ type Order {
   deliveryImages: [OrderImage!]
   id: ID!
   isCancelled: Boolean!
-  notesOnDelivery: String!
-  notesOnPickup: String!
+  items: [OrderItem!]!
   onTheWayAt: DateTime
   orderNumber: String!
   pickedUpAt: DateTime
@@ -148,7 +147,7 @@ type Order {
   """The timeslot for pickup"""
   pickupBetween: OrderTimeslotScalar
   pickupImages: [OrderImage!]
-  product: Product!
+  productVersion: ProductVersion!
   readyForDeliveryAt: DateTime
   readyForDeliveryImages: [OrderImage!]
 
@@ -158,6 +157,8 @@ type Order {
   user: User!
   washer: Washer
   washerAssignedAt: DateTime
+  washerNotesOnDelivery: String!
+  washerNotesOnPickup: String!
 }
 
 type OrderAddress {
@@ -197,6 +198,16 @@ type OrderImage {
   updatedAt: DateTime!
 }
 
+type OrderItem {
+  createdAt: DateTime!
+  id: ID!
+  order: Order!
+  quantity: Float!
+  selectedProductFeatureOptions: [ProductFeatureOptionVersion!]!
+  totalPriceInCents: Float!
+  updatedAt: DateTime!
+}
+
 """Different states of a order"""
 scalar OrderStatusScalar
 
@@ -209,16 +220,17 @@ type Product {
   features: [ProductFeature!]!
   id: ID!
   image: ProductImage!
+  isAvailable: Boolean!
   name: String!
-  orders: [Order!]!
-  price: ProductPrice!
   updatedAt: DateTime!
+  versions: ProductVersion!
 }
 
 type ProductFeature {
   createdAt: DateTime!
   description: String!
   id: ID!
+  isAvailable: Boolean!
   name: String!
   options: [ProductFeatureOption!]!
   updatedAt: DateTime!
@@ -228,11 +240,12 @@ type ProductFeatureOption {
   createdAt: DateTime!
   description: String!
   id: ID!
+  isAvailable: Boolean!
   isDefault: Boolean!
   name: String!
-  price: ProductFeatureOptionPrice
   productFeature: ProductFeature!
   updatedAt: DateTime!
+  versions: ProductFeatureOptionVersion!
 }
 
 type ProductFeatureOptionPrice {
@@ -241,6 +254,16 @@ type ProductFeatureOptionPrice {
   id: ID!
   isPerBag: Boolean!
   updatedAt: DateTime!
+}
+
+type ProductFeatureOptionVersion {
+  createdAt: DateTime!
+  id: ID!
+  orderItems: [OrderItem!]!
+  price: ProductFeatureOptionPrice!
+  productFeatureOption: ProductFeatureOption!
+  updatedAt: DateTime!
+  versionNumber: Float!
 }
 
 type ProductImage {
@@ -257,6 +280,17 @@ type ProductPrice {
   id: ID!
   isPerBag: Boolean!
   updatedAt: DateTime!
+}
+
+type ProductVersion {
+  basePrice: ProductPrice!
+  createdAt: DateTime!
+  deliveryCost: ProductPrice!
+  id: ID!
+  orders: [Order!]!
+  product: Product!
+  updatedAt: DateTime!
+  versionNumber: Float!
 }
 
 type Query {
