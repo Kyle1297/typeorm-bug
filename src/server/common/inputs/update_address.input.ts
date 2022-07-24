@@ -4,30 +4,30 @@ import { AddressEntity } from '../entities/address.entity';
 
 @InputType()
 export class UpdateAddressInput implements Partial<AddressEntity> {
-  @Field({ description: 'Street address line 1', nullable: true })
+  @Field({ description: 'Street address line 1' })
   @MaxLength(255)
-  line1?: string;
+  line1: string;
 
   @Field({
     description: 'Street address line 2',
-    nullable: true,
+    defaultValue: '',
   })
   @MaxLength(255)
-  line2?: string;
+  line2: string;
 
-  @Field({ description: 'City or town', nullable: true })
+  @Field({ description: 'City or town' })
   @MaxLength(255)
-  locality?: string;
+  locality: string;
 
-  @Field({ description: 'State, province or region', nullable: true })
+  @Field({ description: 'State, province or region' })
   @MaxLength(255)
-  administrativeArea?: string;
+  administrativeArea: string;
 
-  @Field({ nullable: true })
+  @Field()
   @MaxLength(255)
-  postalCode?: string;
+  postalCode: string;
 
-  @Field({ nullable: true })
+  @Field()
   @IsISO31661Alpha2()
-  countryCode?: string;
+  countryCode: string;
 }

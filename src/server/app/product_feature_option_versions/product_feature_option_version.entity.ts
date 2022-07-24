@@ -5,7 +5,7 @@ import { BaseEntity } from 'src/server/common/entities/base.entity';
 import { ProductFeatureOptionPrice } from '../product_feature_option_prices/product_feature_option_price.entity';
 import { ProductFeatureOption } from '../product_feature_options/product_feature_option.entity';
 import { ColumnEmbeddedOptions } from 'typeorm/decorator/options/ColumnEmbeddedOptions';
-import { OrderItem } from '../order_items/order_items.entity';
+import { Order } from '../orders/order.entity';
 
 @ObjectType()
 @Entity()
@@ -35,15 +35,11 @@ export class ProductFeatureOptionVersion extends BaseEntity {
   @ManyToOne((_type) => ProductFeatureOptionPrice, { nullable: true })
   readonly price?: ProductFeatureOptionPrice;
 
-  @Field((_type) => [OrderItem])
-  @ManyToMany(
-    (_type) => OrderItem,
-    (orderItem) => orderItem.selectedProductFeatureOptions,
-    {
-      nullable: false,
-    },
-  )
-  orderItems: OrderItem[];
+  @Field((_type) => [Order])
+  @ManyToMany((_type) => Order, (order) => order.preferences, {
+    nullable: false,
+  })
+  orders: Order[];
 
   @BeforeInsert()
   setVersionNumber() {

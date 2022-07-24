@@ -11,6 +11,7 @@ export = {
   database: process.env.POSTGRES_DB,
   entities: ['src/server/app/**/*.entity.ts'],
   migrations: ['src/server/migration/*.{ts,js}'],
+  subscribers: ['src/server/app/**/*.subscriber.ts'],
   cli: {
     migrationsDir: 'src/server/migration',
   },

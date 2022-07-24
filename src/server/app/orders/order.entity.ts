@@ -5,6 +5,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -27,7 +29,7 @@ import { User } from '../users/user.entity';
 import { Washer } from '../washers/washer.entity';
 import { OrderImage } from '../order_images/order_image.entity';
 import { OrderAddress } from '../order_addresses/order_address.entity';
-import { OrderItem } from '../order_items/order_items.entity';
+import { ProductFeatureOptionVersion } from '../product_feature_option_versions/product_feature_option_version.entity';
 
 const ORDER_ID_SEED_PHRASE = 'order-id-seed-phrase';
 
@@ -43,19 +45,41 @@ export class Order extends BaseEntity {
   @Column({ nullable: false })
   currencyCode: string;
 
+  @Field()
+  @Min(1)
+  @Column('integer', { nullable: false })
+  quantity: number;
+
+  @Field()
+  @Column({ nullable: false })
+  isExpressDelivery: boolean;
+
+  @Field()
+  @Min(0)
+  @Column('integer', { nullable: false })
+  totalPriceInCents: number;
+
+  @Field()
+  @IsDate()
+  @Column()
+  pickupDate: Date;
+
   @Field((_type) => OrderTimeslotScalar, {
     description: 'The timeslot for pickup',
-    nullable: true,
   })
-  @Column({ nullable: true })
-  pickupBetween?: OrderTimeslots;
+  @Column()
+  pickupBetween: OrderTimeslots;
+
+  @Field()
+  @IsDate()
+  @Column()
+  deliveryDate: Date;
 
   @Field((_type) => OrderTimeslotScalar, {
     description: 'The timeslot for delivery',
-    nullable: true,
   })
-  @Column({ nullable: true })
-  deliverBetween?: OrderTimeslots;
+  @Column()
+  deliverBetween: OrderTimeslots;
 
   @Field((_type) => OrderStatusScalar, {
     description: 'The current status of the order',
@@ -102,26 +126,26 @@ export class Order extends BaseEntity {
   @Field()
   @MaxLength(1200)
   @Column('text', { nullable: false, default: '' })
-  washerNotesOnPickup?: string;
+  washerNotesOnPickup: string;
 
   @Field()
   @MaxLength(1200)
   @Column('text', { nullable: false, default: '' })
-  washerNotesOnDelivery?: string;
+  washerNotesOnDelivery: string;
 
   @Field((_type) => OrderAddress)
   @OneToOne((_type) => OrderAddress, {
-    nullable: true,
+    cascade: true,
   })
   @JoinColumn()
-  pickupAddress?: OrderAddress;
+  pickupAddress: OrderAddress;
 
-  @Field((_type) => OrderAddress, { nullable: true })
+  @Field((_type) => OrderAddress)
   @OneToOne((_type) => OrderAddress, {
-    nullable: true,
+    cascade: true,
   })
   @JoinColumn()
-  deliveryAddress?: OrderAddress;
+  deliveryAddress: OrderAddress;
 
   @Field((_type) => ProductVersion)
   @ManyToOne(
@@ -129,6 +153,7 @@ export class Order extends BaseEntity {
     (productVersion) => productVersion.orders,
     {
       nullable: false,
+      cascade: true,
     },
   )
   productVersion: ProductVersion;
@@ -144,12 +169,6 @@ export class Order extends BaseEntity {
     nullable: true,
   })
   washer?: Washer;
-
-  @Field((_type) => [OrderItem])
-  @OneToMany((_type) => OrderItem, (orderItem) => orderItem.order, {
-    nullable: false,
-  })
-  items: OrderItem[];
 
   @Field((_type) => [OrderImage], { nullable: true })
   @OneToMany((_type) => OrderImage, (orderImage) => orderImage.order, {
@@ -168,6 +187,18 @@ export class Order extends BaseEntity {
     nullable: true,
   })
   deliveryImages?: OrderImage[];
+
+  @Field((_type) => [ProductFeatureOptionVersion])
+  @ManyToMany(
+    () => ProductFeatureOptionVersion,
+    (productFeatureOptionVersion) => productFeatureOptionVersion.orders,
+    {
+      nullable: false,
+      cascade: true,
+    },
+  )
+  @JoinTable()
+  preferences: ProductFeatureOptionVersion[];
 
   @Field()
   @Column('integer', { nullable: false, default: 0 })
@@ -448,6 +479,9 @@ export class Order extends BaseEntity {
           'Order cannot have delivery images if it has only been confirmed',
         );
       }
+      if (!this.currencyCode) {
+        throw new Error('Order must have a currency code if it is confirmed');
+      }
     }
   }
 
@@ -535,6 +569,11 @@ export class Order extends BaseEntity {
           "Order cannot have delivery images if it's washer has only been assigned",
         );
       }
+      if (!this.currencyCode) {
+        throw new Error(
+          "Order must have a currency code if it's washer has been assigned",
+        );
+      }
     }
   }
 
@@ -608,6 +647,11 @@ export class Order extends BaseEntity {
       if (this.deliveryImages) {
         throw new Error(
           'Order cannot have delivery images if it has only been picked up',
+        );
+      }
+      if (!this.currencyCode) {
+        throw new Error(
+          'Order must have a currency code if it has been picked up',
         );
       }
     }
@@ -685,6 +729,11 @@ export class Order extends BaseEntity {
           'Order cannot have delivery images if it is ready for delivery',
         );
       }
+      if (!this.currencyCode) {
+        throw new Error(
+          'Order must have a currency code if it is ready for delivery',
+        );
+      }
     }
   }
 
@@ -752,6 +801,9 @@ export class Order extends BaseEntity {
           'Order cannot have delivery images if it is on the way',
         );
       }
+      if (!this.currencyCode) {
+        throw new Error('Order must have a currency code if it is on the way');
+      }
     }
   }
 
@@ -815,6 +867,11 @@ export class Order extends BaseEntity {
       if (!this.readyForDeliveryImages) {
         throw new Error(
           'Order must have ready for delivery images if it has been delivered',
+        );
+      }
+      if (!this.currencyCode) {
+        throw new Error(
+          'Order must have a currency code if it has been delivered',
         );
       }
     }

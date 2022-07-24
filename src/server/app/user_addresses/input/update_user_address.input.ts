@@ -18,28 +18,26 @@ export class UpdateUserAddressInput
 {
   @Field({
     description: 'Place or business name',
-    nullable: true,
+    defaultValue: '',
   })
   @MaxLength(255)
-  organisationName?: string;
+  organisationName: string;
 
   @Field((_type) => AddressInstructionScalar, {
     description: 'General instructions for delivery and/or pickup',
-    nullable: true,
   })
-  instructions?: AddressInstructionTypes;
+  instructions: AddressInstructionTypes;
 
   @Field({
     description:
       'E.g. leave on porch, call on delivery, security codes on entry, etc.',
-    nullable: true,
+    defaultValue: '',
   })
-  additionalNotes?: string;
+  additionalNotes: string;
 
   @Field((_type) => AddressTypeScalar, {
     description:
       'Different address types for customers, workers and their businesses',
-    nullable: true,
   })
-  type?: AddressTypes;
+  type: AddressTypes;
 }

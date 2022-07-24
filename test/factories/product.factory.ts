@@ -24,7 +24,7 @@ export const productVersionFactory = FactoryBuilder.of(ProductVersion).props({
   versionNumber: faker.datatype.number(),
   product: productFactory.buildOne(),
   basePrice: productPriceFactory.buildOne(),
-  deliveryCost: productPriceFactory.buildOne(),
+  expressDeliveryPrice: productPriceFactory.buildOne(),
   createdAt: faker.date.past(),
   updatedAt: faker.date.past(),
 });

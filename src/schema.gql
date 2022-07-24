@@ -1,3 +1,28 @@
+input AddOrderAddressInput {
+  """E.g. leave on porch, call on delivery, security codes on entry, etc."""
+  additionalNotes: String = ""
+
+  """State, province or region"""
+  administrativeArea: String!
+  countryCode: String!
+
+  """General instructions for delivery and/or pickup"""
+  instructions: AddressInstructionScalar!
+
+  """Street address line 1"""
+  line1: String!
+
+  """Street address line 2"""
+  line2: String = ""
+
+  """City or town"""
+  locality: String!
+
+  """Place or business name"""
+  organisationName: String = ""
+  postalCode: String!
+}
+
 input AddUserAddressInput {
   """E.g. leave on porch, call on delivery, security codes on entry, etc."""
   additionalNotes: String = ""
@@ -66,6 +91,25 @@ type BusinessAddress {
   updatedAt: DateTime!
 }
 
+input CreateUnconfirmedOrderInput {
+  currencyCode: String!
+
+  """The timeslot for delivery"""
+  deliverBetween: OrderTimeslotScalar!
+  deliveryAddressInput: AddOrderAddressInput!
+  deliveryDate: DateTime!
+  isExpressDelivery: Boolean!
+  pickupAddressInput: AddOrderAddressInput!
+
+  """The timeslot for pickup"""
+  pickupBetween: OrderTimeslotScalar!
+  pickupDate: DateTime!
+  preferenceIds: [String!]!
+  productVersionId: String!
+  quantity: Float!
+  totalPriceInCents: Float!
+}
+
 type CredentialsTakenError implements ErrorResponse {
   message: String!
   providedEmail: String!
@@ -111,14 +155,20 @@ union LoginUserResult = AuthUserResponse | InvalidCredentialsError
 
 type Mutation {
   addUserAddress(input: AddUserAddressInput!): UserAddress!
+  confirmOrder(id: ID!): Order!
+  createUnconfirmedOrder(input: CreateUnconfirmedOrderInput!): Order!
   login(input: LoginUserInput!): [LoginUserResult!]!
   loginSocial(input: LoginSocialInput!): [LoginSocialResult!]!
   register(input: RegisterUserInput!): [RegisterUserResult!]!
   registerSocial(input: RegisterSocialInput!): [RegisterSocialResult!]!
   removeCurrentUser: User!
+  removeOrder(id: ID!): Order!
   removeUserAddress(id: ID!): UserAddress!
   updateCurrentUserName(input: UpdateUserNameInput!): User!
   updateCurrentUserPhone(input: UpdateUserPhoneInput!): User!
+  updateOrderAddresses(id: ID!, input: UpdateOrderAddressesInput!): Order!
+  updateOrderDetails(id: ID!, input: UpdateOrderDetailsInput!): Order!
+  updateOrderSchedule(id: ID!, input: UpdateOrderScheduleInput!): Order!
   updateUserAddress(id: ID!, input: UpdateUserAddressInput!): UserAddress!
 }
 
@@ -132,27 +182,32 @@ type Order {
   currencyCode: String!
 
   """The timeslot for delivery"""
-  deliverBetween: OrderTimeslotScalar
+  deliverBetween: OrderTimeslotScalar!
   deliveredAt: DateTime
-  deliveryAddress: OrderAddress
+  deliveryAddress: OrderAddress!
+  deliveryDate: DateTime!
   deliveryImages: [OrderImage!]
   id: ID!
   isCancelled: Boolean!
-  items: [OrderItem!]!
+  isExpressDelivery: Boolean!
   onTheWayAt: DateTime
   orderNumber: String!
   pickedUpAt: DateTime
   pickupAddress: OrderAddress!
 
   """The timeslot for pickup"""
-  pickupBetween: OrderTimeslotScalar
+  pickupBetween: OrderTimeslotScalar!
+  pickupDate: DateTime!
   pickupImages: [OrderImage!]
+  preferences: [ProductFeatureOptionVersion!]!
   productVersion: ProductVersion!
+  quantity: Float!
   readyForDeliveryAt: DateTime
   readyForDeliveryImages: [OrderImage!]
 
   """The current status of the order"""
   status: OrderStatusScalar!
+  totalPriceInCents: Float!
   updatedAt: DateTime!
   user: User!
   washer: Washer
@@ -195,16 +250,6 @@ type OrderImage {
   key: String!
   name: String!
   order: Order!
-  updatedAt: DateTime!
-}
-
-type OrderItem {
-  createdAt: DateTime!
-  id: ID!
-  order: Order!
-  quantity: Float!
-  selectedProductFeatureOptions: [ProductFeatureOptionVersion!]!
-  totalPriceInCents: Float!
   updatedAt: DateTime!
 }
 
@@ -259,7 +304,7 @@ type ProductFeatureOptionPrice {
 type ProductFeatureOptionVersion {
   createdAt: DateTime!
   id: ID!
-  orderItems: [OrderItem!]!
+  orders: [Order!]!
   price: ProductFeatureOptionPrice!
   productFeatureOption: ProductFeatureOption!
   updatedAt: DateTime!
@@ -285,7 +330,7 @@ type ProductPrice {
 type ProductVersion {
   basePrice: ProductPrice!
   createdAt: DateTime!
-  deliveryCost: ProductPrice!
+  expressDeliveryPrice: ProductPrice!
   id: ID!
   orders: [Order!]!
   product: Product!
@@ -295,6 +340,8 @@ type ProductVersion {
 
 type Query {
   currentUser: User!
+  order(id: ID!): Order!
+  orders: [Order!]!
   product(id: ID!): Product!
   products: [Product!]!
 }
@@ -341,32 +388,52 @@ type SocialProvider {
 """Social provider type such as facebook or google"""
 scalar SocialProviderScalar
 
+input UpdateOrderAddressesInput {
+  deliveryAddressInput: AddOrderAddressInput!
+  pickupAddressInput: AddOrderAddressInput!
+}
+
+input UpdateOrderDetailsInput {
+  preferenceIds: [String!]!
+  quantity: Float!
+}
+
+input UpdateOrderScheduleInput {
+  """The timeslot for delivery"""
+  deliverBetween: OrderTimeslotScalar!
+  deliveryDate: DateTime!
+
+  """The timeslot for pickup"""
+  pickupBetween: OrderTimeslotScalar!
+  pickupDate: DateTime!
+}
+
 input UpdateUserAddressInput {
   """E.g. leave on porch, call on delivery, security codes on entry, etc."""
-  additionalNotes: String
+  additionalNotes: String = ""
 
   """State, province or region"""
-  administrativeArea: String
-  countryCode: String
+  administrativeArea: String!
+  countryCode: String!
 
   """General instructions for delivery and/or pickup"""
-  instructions: AddressInstructionScalar
+  instructions: AddressInstructionScalar!
 
   """Street address line 1"""
-  line1: String
+  line1: String!
 
   """Street address line 2"""
-  line2: String
+  line2: String = ""
 
   """City or town"""
-  locality: String
+  locality: String!
 
   """Place or business name"""
-  organisationName: String
-  postalCode: String
+  organisationName: String = ""
+  postalCode: String!
 
   """Different address types for customers, workers and their businesses"""
-  type: AddressTypeScalar
+  type: AddressTypeScalar!
 }
 
 input UpdateUserNameInput {

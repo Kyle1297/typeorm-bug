@@ -47,7 +47,7 @@ export class UserAddressService {
       );
     }
 
-    // save does not trigger validation, so we need to do it manually
+    // save does not trigger validation, so need to do it manually
     for (const [key, value] of Object.entries(userAddressData)) {
       userAddress[key] = value;
     }

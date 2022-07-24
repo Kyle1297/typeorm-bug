@@ -11,10 +11,9 @@ export class AddAddressInput implements Partial<AddressEntity> {
   @Field({
     description: 'Street address line 2',
     defaultValue: '',
-    nullable: true,
   })
   @MaxLength(255)
-  line2?: string;
+  line2: string;
 
   @Field({ description: 'City or town' })
   @MaxLength(255)

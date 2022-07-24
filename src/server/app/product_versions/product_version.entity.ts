@@ -33,7 +33,7 @@ export class ProductVersion extends BaseEntity {
 
   @Field((_type) => ProductPrice)
   @ManyToOne((_type) => ProductPrice, { nullable: false })
-  readonly deliveryCost: ProductPrice;
+  readonly expressDeliveryPrice: ProductPrice;
 
   @Field((_type) => [Order])
   @OneToMany((_type) => Order, (order) => order.productVersion, {
@@ -43,6 +43,15 @@ export class ProductVersion extends BaseEntity {
 
   @BeforeInsert()
   setVersionNumber() {
-    this.versionNumber = this.product.versions.length + 1;
+    this.versionNumber = this.product.versions.reduce(
+      (latestVersionNumber, currentVersion) => {
+        const currentVersionNumber = currentVersion.versionNumber;
+
+        return currentVersionNumber > latestVersionNumber
+          ? currentVersionNumber
+          : latestVersionNumber;
+      },
+      0,
+    );
   }
 }

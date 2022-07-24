@@ -1,20 +1,16 @@
-import { UserAddress } from '../user_address.entity';
 import { Field, InputType } from '@nestjs/graphql';
 import { MaxLength } from 'class-validator';
+import { AddAddressInput } from 'src/server/common/inputs/add_address.input';
 import {
   AddressInstructionScalar,
   AddressInstructionTypes,
 } from '../../../common/scalars/address_instruction.scalar';
-import {
-  AddressTypes,
-  AddressTypeScalar,
-} from '../scalars/address_type.scalar';
-import { AddAddressInput } from 'src/server/common/inputs/add_address.input';
+import { OrderAddress } from '../order_address.entity';
 
 @InputType()
-export class AddUserAddressInput
+export class AddOrderAddressInput
   extends AddAddressInput
-  implements Partial<UserAddress>
+  implements Partial<OrderAddress>
 {
   @Field({
     description: 'Place or business name',
@@ -34,10 +30,4 @@ export class AddUserAddressInput
     defaultValue: '',
   })
   additionalNotes: string;
-
-  @Field((_type) => AddressTypeScalar, {
-    description:
-      'Different address types for customers, workers and their businesses',
-  })
-  type: AddressTypes;
 }
