@@ -7,10 +7,10 @@ export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
 
   findAll(): Promise<Product[]> {
-    return this.productRepository.findAllWithImagePricesAndFeatures();
+    return this.productRepository.findAllWithImagePricesAndVersion();
   }
 
   findOne(id: string): Promise<Product> {
-    return this.productRepository.findOneWithImagePricesAndFeatures(id);
+    return this.productRepository.findOneWithImagePricesVersionAndFeatures(id);
   }
 }

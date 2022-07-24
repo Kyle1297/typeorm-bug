@@ -19,12 +19,14 @@ export const productFactory = FactoryBuilder.of(Product)
   })
   .build();
 
-export const productVersionFactory = FactoryBuilder.of(ProductVersion).props({
-  id: faker.datatype.uuid(),
-  versionNumber: faker.datatype.number(),
-  product: productFactory.buildOne(),
-  basePrice: productPriceFactory.buildOne(),
-  expressDeliveryPrice: productPriceFactory.buildOne(),
-  createdAt: faker.date.past(),
-  updatedAt: faker.date.past(),
-});
+export const productVersionFactory = FactoryBuilder.of(ProductVersion)
+  .props({
+    id: faker.datatype.uuid(),
+    versionNumber: faker.datatype.number(),
+    product: productFactory.buildOne(),
+    basePrice: productPriceFactory.buildOne(),
+    expressDeliveryPrice: productPriceFactory.buildOne(),
+    createdAt: faker.date.past(),
+    updatedAt: faker.date.past(),
+  })
+  .build();

@@ -505,6 +505,7 @@ type Washer {
   """The current status of the washer"""
   status: WasherStatusScalar!
   updatedAt: DateTime!
+  user: User!
 }
 
 type WasherAddress {

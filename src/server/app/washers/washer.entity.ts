@@ -19,6 +19,7 @@ import { Business } from '../businesses/business.entity';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
 import { Order } from '../orders/order.entity';
 import { WasherAddress } from '../washer_addresses/washer_address.entity';
+import { User } from '../users/user.entity';
 
 @ObjectType()
 @Entity()
@@ -61,6 +62,11 @@ export class Washer extends BaseEntity {
     nullable: false,
   })
   orders: Order[];
+
+  @Field((_type) => User)
+  @OneToOne((_type) => User)
+  @JoinColumn()
+  user: User;
 
   @BeforeInsert()
   setDefaultLastStatusChangeAt() {

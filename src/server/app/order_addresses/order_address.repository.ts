@@ -1,3 +1,4 @@
+import validateEntity from 'src/server/common/utils/validateEntity';
 import { EntityRepository, Repository } from 'typeorm';
 import { OrderAddress } from './order_address.entity';
 
@@ -11,5 +12,20 @@ export class OrderAddressRepository extends Repository<OrderAddress> {
     }
 
     return orderAddress;
+  }
+
+  async updateOne(
+    id: string,
+    orderAddressData: Partial<OrderAddress>,
+  ): Promise<OrderAddress> {
+    const orderAddress = await this.findOneOrError(id);
+
+    // save does not trigger validation, so need to do it manually
+    for (const [key, value] of Object.entries(orderAddressData)) {
+      orderAddress[key] = value;
+    }
+    await validateEntity(orderAddress);
+
+    return this.save({ ...orderAddressData, id });
   }
 }

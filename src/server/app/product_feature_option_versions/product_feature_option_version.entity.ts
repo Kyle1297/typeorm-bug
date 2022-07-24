@@ -43,6 +43,15 @@ export class ProductFeatureOptionVersion extends BaseEntity {
 
   @BeforeInsert()
   setVersionNumber() {
-    this.versionNumber = this.productFeatureOption.versions.length + 1;
+    this.versionNumber = this.productFeatureOption.versions.reduce(
+      (latestVersionNumber, currentVersion) => {
+        const currentVersionNumber = currentVersion.versionNumber;
+
+        return currentVersionNumber > latestVersionNumber
+          ? currentVersionNumber
+          : latestVersionNumber;
+      },
+      0,
+    );
   }
 }

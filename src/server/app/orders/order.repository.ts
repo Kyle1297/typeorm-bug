@@ -1,14 +1,9 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { UpdateOrderAddressInput } from '../order_addresses/input/update_order_address.input';
-import { OrderAddressService } from '../order_addresses/order_address.service';
+import { OrderAddressRepository } from '../order_addresses/order_address.repository';
 import { Order } from './order.entity';
-
 @EntityRepository(Order)
 export class OrderRepository extends Repository<Order> {
-  constructor(private readonly orderAddressService: OrderAddressService) {
-    super();
-  }
-
   findOneForUserWithAddressesProductWasherFeaturesAndPrices(
     id: string,
     userId: string,
@@ -83,12 +78,16 @@ export class OrderRepository extends Repository<Order> {
     deliveryAddressInput: UpdateOrderAddressInput,
   ): Promise<Order> {
     return this.manager.transaction(async (transactionalManager) => {
-      const pickupAddress = await this.orderAddressService.update(
+      const orderRepository = transactionalManager.getCustomRepository(
+        OrderAddressRepository,
+      );
+
+      const pickupAddress = await orderRepository.updateOne(
         order.pickupAddress.id,
         pickupAddressInput,
       );
 
-      const deliveryAddress = await this.orderAddressService.update(
+      const deliveryAddress = await orderRepository.updateOne(
         order.deliveryAddress.id,
         deliveryAddressInput,
       );

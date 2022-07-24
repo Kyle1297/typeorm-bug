@@ -8,6 +8,8 @@ import { UserAddress } from 'src/server/app/user_addresses/user_address.entity';
 import { BusinessAddress } from 'src/server/app/business_addresses/business_address.entity';
 import { WasherAddress } from 'src/server/app/washer_addresses/washer_address.entity';
 import { OrderAddress } from 'src/server/app/order_addresses/order_address.entity';
+import { UpdateOrderAddressInput } from 'src/server/app/order_addresses/input/update_order_address.input';
+import { AddOrderAddressInput } from 'src/server/app/order_addresses/input/add_order_address.input';
 
 const addressFactory = FactoryBuilder.of(UserAddress)
   .props({
@@ -73,4 +75,21 @@ export const orderAddressFactory = FactoryBuilder.of(OrderAddress)
     updatedAt: faker.date.past(),
   })
   .mixins([addressFactory])
+  .build();
+
+export const addOrderAddressInputFactory = FactoryBuilder.of(
+  AddOrderAddressInput,
+)
+  .props({
+    organisationName: faker.company.companyName(),
+    instructions: faker.random.arrayElement(addressInstructions),
+    additionalNotes: faker.lorem.sentence(),
+  })
+  .mixins([addressFactory])
+  .build();
+
+export const updateOrderAddressInputFactory = FactoryBuilder.of(
+  UpdateOrderAddressInput,
+)
+  .mixins([addOrderAddressInputFactory])
   .build();

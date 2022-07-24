@@ -51,5 +51,5 @@ export class Product extends BaseEntity {
   )
   versions: ProductVersion[];
 
-  latestProductVersion: ProductVersion;
+  latestVersion: ProductVersion;
 }

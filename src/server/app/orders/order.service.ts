@@ -23,7 +23,7 @@ export class OrderService {
   }
 
   createUnconfirmed(
-    order: CreateUnconfirmedOrderInput,
+    input: CreateUnconfirmedOrderInput,
     user: User,
   ): Promise<Order> {
     const {
@@ -32,7 +32,7 @@ export class OrderService {
       productVersionId,
       preferenceIds,
       ...rest
-    } = order;
+    } = input;
 
     const preparedOrder = this.orderRepository.create({
       ...rest,

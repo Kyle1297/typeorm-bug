@@ -1,7 +1,7 @@
 import * as faker from 'faker';
 import { FactoryBuilder } from 'factory.io';
 import { Business } from 'src/server/app/businesses/business.entity';
-import { addressFactory } from './address.factory';
+import { businessAddressFactory } from './address.factory';
 
 export const businessFactory = FactoryBuilder.of(Business)
   .props({
@@ -9,7 +9,7 @@ export const businessFactory = FactoryBuilder.of(Business)
     name: faker.company.companyName(),
     businessNumber: faker.datatype.number().toString(),
     isGstRegistered: faker.datatype.boolean(),
-    address: addressFactory.buildOne(),
+    address: businessAddressFactory.buildOne(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
   })

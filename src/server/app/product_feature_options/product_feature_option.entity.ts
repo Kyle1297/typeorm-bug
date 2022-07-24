@@ -46,4 +46,6 @@ export class ProductFeatureOption extends BaseEntity {
     },
   )
   versions: ProductFeatureOptionVersion[];
+
+  latestVersion: ProductFeatureOptionVersion;
 }
