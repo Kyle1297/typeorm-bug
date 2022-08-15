@@ -24,7 +24,7 @@ import { OrderAddressModule } from './order_addresses/order_address.module';
 import { UserAddressModule } from './user_addresses/user_address.module';
 import { ProductModule } from './products/product.module';
 import { ProductFeatureOptionVersionModule } from './product_feature_option_versions/product_feature_option_version.module';
-import '../common/decorators/VirtualColumn/polyfill';
+import { PaymentModule } from './payments/payment.module';
 
 @Module({
   imports: [
@@ -56,6 +56,7 @@ import '../common/decorators/VirtualColumn/polyfill';
     OrderAddressModule,
     BusinessAddressModule,
     WasherAddressModule,
+    PaymentModule,
   ],
   providers: [SeedService],
 })

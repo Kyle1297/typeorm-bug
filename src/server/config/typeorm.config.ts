@@ -12,6 +12,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       password: process.env.POSTGRS_PASSWORD,
       database: process.env.POSTGRES_DB,
       autoLoadEntities: true,
+      synchronize: process.env.NODE_ENV === 'development',
       subscribers: [__dirname + '/**/*.subscriber.ts'],
       ssl:
         process.env.NODE_ENV === 'production'

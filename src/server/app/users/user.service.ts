@@ -1,15 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import validateEntity from 'src/server/common/utils/validateEntity';
+import { validateEntity } from 'src/server/common/utils/validateEntity';
+import { RegisterUserInput } from '../auth/inputs/register_user.input';
+import { PaymentService } from '../payments/payment.service';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly paymentService: PaymentService,
+  ) {}
 
-  save(user: Partial<User>): Promise<User> {
-    const preparedUser = this.userRepository.create(user);
-    return this.userRepository.save(preparedUser);
+  async create(userInput: RegisterUserInput): Promise<User> {
+    const preparedUser = this.userRepository.create(userInput);
+    const stripeCustomer = await this.paymentService.createCustomer(
+      preparedUser,
+    );
+    preparedUser.stripeCustomerId = stripeCustomer.id;
+
+    return await this.userRepository.save(preparedUser);
   }
 
   findOneByEmail(email: string): Promise<User> {
@@ -18,10 +28,6 @@ export class UserService {
 
   findOneBySocialId(socialId: string): Promise<User | undefined> {
     return this.userRepository.findOneAndAllAddressesBySocialId(socialId);
-  }
-
-  async remove(user: User): Promise<User> {
-    return this.userRepository.remove(user);
   }
 
   existsByCredentials(user: Pick<User, 'email'>): Promise<boolean> {

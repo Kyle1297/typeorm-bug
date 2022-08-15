@@ -13,6 +13,7 @@ import { User } from '../users/user.entity';
 import { either, Either } from 'src/server/common/utils/either';
 import { RegisterSocialInput } from './inputs/register_social.input';
 import { SocialProviderTypes } from './scalars/social_provider.scalar';
+import { PaymentService } from '../payments/payment.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
     private readonly socialProviderRepository: SocialProviderRepository,
+    private readonly paymentService: PaymentService,
   ) {}
 
   async validateCredentials(
@@ -55,7 +57,8 @@ export class AuthService {
         }),
       );
     }
-    const returnedUser = await this.userService.save(user);
+    const returnedUser = await this.userService.create(user);
+
     return either.of(returnedUser);
   }
 
@@ -79,7 +82,7 @@ export class AuthService {
   async registerSocial(profile: Profile, input: RegisterSocialInput) {
     const email = profile.emails?.[0].value;
     const socialId = profile.id;
-    const { provider, phoneCountryCode, phoneNumber } = input;
+    const { provider, phoneCountryCode, phoneNumber, locale } = input;
 
     if (await this.socialProviderRepository.existsBySocialId(socialId)) {
       return either.error(
@@ -101,13 +104,21 @@ export class AuthService {
       );
     }
 
+    const userInput = {
+      email,
+      phoneCountryCode,
+      phoneNumber,
+      locale,
+      firstName: profile.name.givenName,
+      lastName: profile.name.familyName,
+    } as Partial<User>;
+
+    const stripeCustomer = await this.paymentService.createCustomer(userInput);
+
     const user = await this.socialProviderRepository.saveProviderAndUser(
       {
-        email,
-        phoneCountryCode,
-        phoneNumber,
-        firstName: profile.name.givenName,
-        lastName: profile.name.familyName,
+        ...userInput,
+        stripeCustomerId: stripeCustomer.id,
       },
       { provider, socialId },
     );

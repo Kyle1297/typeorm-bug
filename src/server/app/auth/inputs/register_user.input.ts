@@ -1,6 +1,7 @@
 import { Field, InputType, PickType } from '@nestjs/graphql';
 import {
   IsISO31661Alpha2,
+  IsLocale,
   IsPhoneNumber,
   MaxLength,
   MinLength,
@@ -28,4 +29,8 @@ export class RegisterUserInput extends PickType(User, ['email'], InputType) {
   @Field()
   @IsPhoneNumber()
   phoneNumber: string;
+
+  @Field()
+  @IsLocale()
+  locale: string;
 }

@@ -186,8 +186,9 @@ type Order {
   deliveredAt: DateTime
   deliveryAddress: OrderAddress!
   deliveryDate: DateTime!
-  deliveryImages: [OrderImage!]
+  deliveryImages: [OrderImage!]!
   id: ID!
+  images: [OrderImage!]!
   isCancelled: Boolean!
   isExpressDelivery: Boolean!
   onTheWayAt: DateTime
@@ -198,16 +199,15 @@ type Order {
   """The timeslot for pickup"""
   pickupBetween: OrderTimeslotScalar!
   pickupDate: DateTime!
-  pickupImages: [OrderImage!]
+  pickupImages: [OrderImage!]!
   preferences: [ProductFeatureOptionVersion!]!
   productVersion: ProductVersion!
   quantity: Float!
   readyForDeliveryAt: DateTime
-  readyForDeliveryImages: [OrderImage!]
+  readyForDeliveryImages: [OrderImage!]!
 
   """The current status of the order"""
   status: OrderStatusScalar!
-  totalPriceInCents: Float!
   updatedAt: DateTime!
   user: User!
   washer: Washer
@@ -250,8 +250,14 @@ type OrderImage {
   key: String!
   name: String!
   order: Order!
+
+  """Different types of order images"""
+  type: OrderImageTypeScalar!
   updatedAt: DateTime!
 }
+
+"""Different types of order images"""
+scalar OrderImageTypeScalar
 
 """Different states of a order"""
 scalar OrderStatusScalar
@@ -266,9 +272,10 @@ type Product {
   id: ID!
   image: ProductImage!
   isAvailable: Boolean!
+  latestVersion: ProductVersion!
   name: String!
   updatedAt: DateTime!
-  versions: ProductVersion!
+  versions: [ProductVersion!]!
 }
 
 type ProductFeature {
@@ -287,10 +294,11 @@ type ProductFeatureOption {
   id: ID!
   isAvailable: Boolean!
   isDefault: Boolean!
+  latestVersion: ProductFeatureOptionVersion!
   name: String!
   productFeature: ProductFeature!
   updatedAt: DateTime!
-  versions: ProductFeatureOptionVersion!
+  versions: [ProductFeatureOptionVersion!]!
 }
 
 type ProductFeatureOptionPrice {
@@ -305,7 +313,7 @@ type ProductFeatureOptionVersion {
   createdAt: DateTime!
   id: ID!
   orders: [Order!]!
-  price: ProductFeatureOptionPrice!
+  price: ProductFeatureOptionPrice
   productFeatureOption: ProductFeatureOption!
   updatedAt: DateTime!
   versionNumber: Float!

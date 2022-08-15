@@ -8,40 +8,48 @@ export class ProductRepository extends Repository<Product> {
       .leftJoinAndSelect('product.image', 'image')
       .leftJoinAndSelect('product.features', 'feature')
       .leftJoinAndSelect('feature.options', 'option')
-      .leftJoinAndSelect('option.latestVersion', 'latestOptionVersion')
+      .leftJoinAndSelect('option.versions', 'optionVersion')
       .leftJoinAndSelect(
-        'latestOptionVersion.price',
+        'optionVersion.price',
         'optionPrice',
-        'optionPrice.id = latestOptionVersion.priceId',
+        'optionPrice.id = optionVersion.priceId',
       )
-      .leftJoinAndSelect('product.latestVersion', 'latestProductVersion')
+      .leftJoinAndSelect('product.versions', 'productVersion')
       .leftJoinAndSelect(
-        'latestProductVersion.basePrice',
+        'productVersion.basePrice',
         'basePrice',
-        'basePrice.id = latestProductVersion.basePriceId',
+        'basePrice.id = productVersion.basePriceId',
       )
       .leftJoinAndSelect(
-        'latestProductVersion.expressDeliveryPrice',
+        'productVersion.expressDeliveryPrice',
         'expressDeliveryPrice',
-        'expressDeliveryPrice.id = latestProductVersion.expressDeliveryPriceId',
+        'expressDeliveryPrice.id = productVersion.expressDeliveryPriceId',
       )
       .where('product.id = :id', { id })
       .getOne();
   }
 
-  async findAllWithImagePricesAndVersion(): Promise<Product[]> {
+  async findAllWithImagePricesVersionAndFeatures(): Promise<Product[]> {
     return this.createQueryBuilder('product')
       .leftJoinAndSelect('product.image', 'image')
-      .leftJoinAndSelect('product.latestVersion', 'latestProductVersion')
+      .leftJoinAndSelect('product.features', 'feature')
+      .leftJoinAndSelect('feature.options', 'option')
+      .leftJoinAndSelect('option.versions', 'optionVersion')
       .leftJoinAndSelect(
-        'latestProductVersion.basePrice',
+        'optionVersion.price',
+        'optionPrice',
+        'optionPrice.id = optionVersion.priceId',
+      )
+      .leftJoinAndSelect('product.versions', 'productVersion')
+      .leftJoinAndSelect(
+        'productVersion.basePrice',
         'basePrice',
-        'basePrice.id = latestProductVersion.basePriceId',
+        'basePrice.id = productVersion.basePriceId',
       )
       .leftJoinAndSelect(
-        'latestProductVersion.expressDeliveryPrice',
+        'productVersion.expressDeliveryPrice',
         'expressDeliveryPrice',
-        'expressDeliveryPrice.id = latestProductVersion.expressDeliveryPriceId',
+        'expressDeliveryPrice.id = productVersion.expressDeliveryPriceId',
       )
       .getMany();
   }

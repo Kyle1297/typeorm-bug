@@ -1,4 +1,11 @@
-import { BeforeInsert, Column, Entity, ManyToMany, ManyToOne } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  Index,
+  ManyToMany,
+  ManyToOne,
+} from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Min } from 'class-validator';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
@@ -12,6 +19,7 @@ import { Order } from '../orders/order.entity';
 export class ProductFeatureOptionVersion extends BaseEntity {
   @Field()
   @Min(1)
+  @Index()
   @Column(
     'integer' as unknown as (type?: any) => () => any,
     {
@@ -31,7 +39,7 @@ export class ProductFeatureOptionVersion extends BaseEntity {
   )
   readonly productFeatureOption: ProductFeatureOption;
 
-  @Field((_type) => ProductFeatureOptionPrice)
+  @Field((_type) => ProductFeatureOptionPrice, { nullable: true })
   @ManyToOne((_type) => ProductFeatureOptionPrice, { nullable: true })
   readonly price?: ProductFeatureOptionPrice;
 
@@ -51,7 +59,7 @@ export class ProductFeatureOptionVersion extends BaseEntity {
           ? currentVersionNumber
           : latestVersionNumber;
       },
-      0,
+      1,
     );
   }
 }

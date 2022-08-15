@@ -38,6 +38,7 @@ export const registerSocialInputFactory = FactoryBuilder.of(RegisterSocialInput)
   .props({
     phoneCountryCode: 'AU',
     phoneNumber: faker.phone.phoneNumber('+61 431 ### ###'),
+    locale: 'en-AU',
   })
   .mixins([loginSocialInputFactory])
   .build();

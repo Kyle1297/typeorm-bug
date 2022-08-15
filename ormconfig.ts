@@ -15,6 +15,7 @@ export = {
   cli: {
     migrationsDir: 'src/server/migration',
   },
+  synchronize: process.env.NODE_ENV === 'development',
   extra: {
     ssl:
       process.env.NODE_ENV === 'production'

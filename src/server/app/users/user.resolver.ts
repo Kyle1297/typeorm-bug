@@ -1,4 +1,4 @@
-import { Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './user.entity';
 import { UseGuards } from '@nestjs/common';
@@ -9,38 +9,57 @@ import {
   UpdateUserNameInput,
   UpdateUserPhoneInput,
 } from './input/update_user.input';
+import { PaymentService } from '../payments/payment.service';
 
 @Resolver()
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly paymentService: PaymentService,
+  ) {}
 
   @Query((_returns) => User)
   @UseGuards(JwtGqlAuthGuard)
-  async currentUser(@GqlUser() user: User): Promise<User> {
+  async user(@GqlUser() user: User): Promise<User> {
     return user;
   }
 
   @Mutation((_returns) => User)
   @UseGuards(JwtGqlAuthGuard)
-  async removeCurrentUser(@GqlUser() user: User): Promise<User> {
-    return this.userService.remove(user);
-  }
-
-  @Mutation((_returns) => User)
-  @UseGuards(JwtGqlAuthGuard)
-  async updateCurrentUserName(
+  async updateUserName(
     @GqlUser() user: User,
     @Input() input: UpdateUserNameInput,
   ) {
-    return this.userService.update(user, input);
+    const updatedUser = await this.userService.update(user, input);
+
+    // update stripe customer
+    await this.paymentService.updateCustomer(user.stripeCustomerId, {
+      name: updatedUser.fullName,
+    });
+
+    return updatedUser;
   }
 
   @Mutation((_returns) => User)
   @UseGuards(JwtGqlAuthGuard)
-  async updateCurrentUserPhone(
+  async updateUserPhone(
     @GqlUser() user: User,
     @Input() input: UpdateUserPhoneInput,
   ) {
-    return this.userService.update(user, input);
+    const updatedUser = await this.userService.update(user, input);
+
+    // update stripe customer
+    await this.paymentService.updateCustomer(user.stripeCustomerId, {
+      phone: updatedUser.phoneNumber,
+    });
+
+    return updatedUser;
+  }
+
+  @Query((_returns) => Boolean)
+  async userExists(
+    @Args({ name: 'email', type: () => String }) email: string,
+  ): Promise<boolean> {
+    return this.userService.existsByCredentials({ email });
   }
 }

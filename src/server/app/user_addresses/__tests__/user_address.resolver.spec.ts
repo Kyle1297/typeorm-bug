@@ -8,6 +8,12 @@ import {
   updateUserAddressInputFactory,
   addUserAddressInputFactory,
 } from 'test/factories/address.factory';
+import { UserService } from '../../users/user.service';
+import { UserRepository } from '../../users/user.repository';
+import stripeConfig from 'src/server/config/stripe.config';
+import { PaymentService } from '../../payments/payment.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { StripeModule } from '@golevelup/nestjs-stripe';
 
 describe('UserAddressResolver', () => {
   let resolver: UserAddressResolver;
@@ -15,10 +21,24 @@ describe('UserAddressResolver', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forFeature(stripeConfig),
+        StripeModule.forRootAsync(StripeModule, {
+          imports: [ConfigModule],
+          useFactory: async (configService: ConfigService) => ({
+            apiKey: configService.get('stripe.apiKey'),
+            apiVersion: configService.get('stripe.apiVersion'),
+          }),
+          inject: [ConfigService],
+        }),
+      ],
       providers: [
         UserAddressResolver,
         UserAddressService,
         UserAddressRepository,
+        UserService,
+        UserRepository,
+        PaymentService,
       ],
     }).compile();
 
@@ -34,7 +54,8 @@ describe('UserAddressResolver', () => {
         ...addUserAddress,
         user,
       });
-      jest.spyOn(service, 'save').mockResolvedValueOnce(userAddress);
+
+      jest.spyOn(service, 'create').mockResolvedValueOnce(userAddress);
 
       const result = await resolver.addUserAddress(addUserAddress, user);
 
@@ -50,6 +71,7 @@ describe('UserAddressResolver', () => {
         ...userAddressInput,
         user,
       });
+
       jest.spyOn(service, 'update').mockResolvedValueOnce(userAddress);
 
       const result = await resolver.updateUserAddress(
@@ -62,17 +84,42 @@ describe('UserAddressResolver', () => {
     });
   });
 
-  describe('removeUserAddress Mutation', () => {
-    it('should allow removing userAddress', async () => {
+  describe('removeUserAddress mutation', () => {
+    it('should allow removing user address', async () => {
       const user = userFactory.buildOne();
       const userAddress = userAddressFactory.buildOne({
         user,
       });
+
       jest.spyOn(service, 'remove').mockResolvedValueOnce(userAddress);
 
       const result = await resolver.removeUserAddress(userAddress.id, user);
 
       expect(result).toBe(userAddress);
+    });
+  });
+
+  describe('selectUserAddress mutation', () => {
+    it('should allow selecting user address', async () => {
+      const user = userFactory.buildOne();
+      const userAddress = userAddressFactory.buildOne({
+        user,
+        type: 'PICKUP_AND_DELIVERY',
+        isSelectedDelivery: false,
+        isSelectedPickup: false,
+      });
+      const updatedAddress = userAddressFactory.buildOne({
+        ...userAddress,
+        isSelectedDelivery: true,
+        isSelectedPickup: true,
+      });
+
+      jest.spyOn(service, 'findOne').mockResolvedValueOnce(userAddress);
+      jest.spyOn(service, 'select').mockResolvedValueOnce(updatedAddress);
+
+      const result = await resolver.selectUserAddress(userAddress.id, user);
+
+      expect(result).toBe(updatedAddress);
     });
   });
 });

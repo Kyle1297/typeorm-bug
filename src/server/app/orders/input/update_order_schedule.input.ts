@@ -25,4 +25,7 @@ export class UpdateOrderScheduleInput implements Partial<Order> {
     description: 'The timeslot for delivery',
   })
   deliverBetween: OrderTimeslots;
+
+  @Field()
+  isExpressDelivery: boolean;
 }

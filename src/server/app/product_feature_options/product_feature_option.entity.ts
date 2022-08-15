@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { AfterLoad, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { MaxLength } from 'class-validator';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
@@ -36,7 +36,7 @@ export class ProductFeatureOption extends BaseEntity {
   )
   productFeature: ProductFeature;
 
-  @Field((_type) => ProductFeatureOptionVersion)
+  @Field((_type) => [ProductFeatureOptionVersion])
   @OneToMany(
     (_type) => ProductFeatureOptionVersion,
     (productFeatureOptionVersion) =>
@@ -47,5 +47,20 @@ export class ProductFeatureOption extends BaseEntity {
   )
   versions: ProductFeatureOptionVersion[];
 
+  @Field((_type) => ProductFeatureOptionVersion)
   latestVersion: ProductFeatureOptionVersion;
+
+  @AfterLoad()
+  fetchLatestVersion() {
+    if (this.versions) {
+      this.latestVersion = this.versions.reduce(
+        (latestVersion, currentVersion) => {
+          return currentVersion.versionNumber > latestVersion.versionNumber
+            ? currentVersion
+            : latestVersion;
+        },
+        this.versions[0],
+      );
+    }
+  }
 }

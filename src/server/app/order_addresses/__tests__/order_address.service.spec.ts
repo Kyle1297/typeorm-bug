@@ -1,8 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  orderAddressFactory,
-  updateOrderAddressInputFactory,
-} from 'test/factories/address.factory';
+import { orderAddressFactory } from 'test/factories/address.factory';
 import { OrderAddressRepository } from '../order_address.repository';
 import { OrderAddressService } from '../order_address.service';
 
@@ -24,7 +21,6 @@ describe('OrderAddressService', () => {
   describe('update', () => {
     it('should update orderAddress', async () => {
       const orderAddress = orderAddressFactory.buildOne();
-      const orderAddressData = updateOrderAddressInputFactory.buildOne();
 
       const updatedOrderAddress = orderAddressFactory.buildOne({
         ...orderAddress,

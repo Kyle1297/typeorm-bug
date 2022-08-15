@@ -7,7 +7,7 @@ export class ProductService {
   constructor(private readonly productRepository: ProductRepository) {}
 
   findAll(): Promise<Product[]> {
-    return this.productRepository.findAllWithImagePricesAndVersion();
+    return this.productRepository.findAllWithImagePricesVersionAndFeatures();
   }
 
   findOne(id: string): Promise<Product> {

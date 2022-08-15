@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsISO31661Alpha2, IsPhoneNumber } from 'class-validator';
+import { IsISO31661Alpha2, IsLocale, IsPhoneNumber } from 'class-validator';
 import { LoginSocialInput } from './login_social.input';
 
 @InputType()
@@ -11,4 +11,8 @@ export class RegisterSocialInput extends LoginSocialInput {
   @Field()
   @IsPhoneNumber()
   phoneNumber: string;
+
+  @Field()
+  @IsLocale()
+  locale: string;
 }

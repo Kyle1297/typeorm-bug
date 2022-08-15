@@ -19,7 +19,7 @@ export class UserAddressResolver {
     @Input() input: AddUserAddressInput,
     @GqlUser() user: User,
   ): Promise<UserAddress> {
-    return this.userAddressService.save(input, user);
+    return this.userAddressService.create(input, user);
   }
 
   @UseGuards(JwtGqlAuthGuard)
@@ -39,5 +39,16 @@ export class UserAddressResolver {
     @GqlUser() user: User,
   ): Promise<UserAddress> {
     return this.userAddressService.update(id, input, user);
+  }
+
+  @UseGuards(JwtGqlAuthGuard)
+  @Mutation((_returns) => UserAddress)
+  async selectUserAddress(
+    @Args({ name: 'id', type: () => ID }) id: string,
+    @GqlUser() user: User,
+  ): Promise<UserAddress> {
+    const userAddress = await this.userAddressService.findOne(id, user);
+
+    return this.userAddressService.select(userAddress, user);
   }
 }

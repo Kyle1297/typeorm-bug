@@ -8,8 +8,7 @@ import { UserAddress } from 'src/server/app/user_addresses/user_address.entity';
 import { BusinessAddress } from 'src/server/app/business_addresses/business_address.entity';
 import { WasherAddress } from 'src/server/app/washer_addresses/washer_address.entity';
 import { OrderAddress } from 'src/server/app/order_addresses/order_address.entity';
-import { UpdateOrderAddressInput } from 'src/server/app/order_addresses/input/update_order_address.input';
-import { AddOrderAddressInput } from 'src/server/app/order_addresses/input/add_order_address.input';
+import Stripe from 'stripe';
 
 const addressFactory = FactoryBuilder.of(UserAddress)
   .props({
@@ -42,6 +41,8 @@ export const userAddressFactory = FactoryBuilder.of(UserAddress)
   .props({
     id: faker.datatype.uuid(),
     user: null,
+    isSelectedDelivery: faker.datatype.boolean(),
+    isSelectedPickup: faker.datatype.boolean(),
     createdAt: faker.date.past(),
     updatedAt: faker.date.past(),
   })
@@ -77,19 +78,13 @@ export const orderAddressFactory = FactoryBuilder.of(OrderAddress)
   .mixins([addressFactory])
   .build();
 
-export const addOrderAddressInputFactory = FactoryBuilder.of(
-  AddOrderAddressInput,
-)
+export const stripeAddressFactory = FactoryBuilder.of(Stripe['Address'])
   .props({
-    organisationName: faker.company.companyName(),
-    instructions: faker.random.arrayElement(addressInstructions),
-    additionalNotes: faker.lorem.sentence(),
+    city: faker.address.city(),
+    country: faker.address.country(),
+    line1: faker.address.streetAddress(),
+    line2: faker.address.secondaryAddress(),
+    postal_code: faker.address.zipCode(),
+    state: faker.address.state(),
   })
-  .mixins([addressFactory])
-  .build();
-
-export const updateOrderAddressInputFactory = FactoryBuilder.of(
-  UpdateOrderAddressInput,
-)
-  .mixins([addOrderAddressInputFactory])
   .build();

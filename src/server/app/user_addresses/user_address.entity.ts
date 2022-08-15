@@ -1,4 +1,11 @@
-import { Column, Entity, Index, ManyToOne } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+} from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { MaxLength } from 'class-validator';
 import {
@@ -28,6 +35,7 @@ export class UserAddress extends AddressEntity {
       'E.g. leave on porch, call on delivery, security codes on entry, etc.',
     defaultValue: '',
   })
+  @MaxLength(1200)
   @Column({ nullable: false, default: '' })
   additionalNotes: string;
 
@@ -39,9 +47,54 @@ export class UserAddress extends AddressEntity {
   @Column({ nullable: false })
   type: AddressTypes;
 
+  @Field()
+  @Index()
+  @Column({ nullable: false })
+  isSelectedPickup: boolean;
+
+  @Field()
+  @Index()
+  @Column({ nullable: false })
+  isSelectedDelivery: boolean;
+
   @Field((_type) => User)
   @ManyToOne((_type) => User, (user) => user.addresses, {
     nullable: false,
   })
   user: User;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  validateDuplicateAddress() {
+    const isDuplicate = this.user.isDuplicateAddress(this);
+
+    if (isDuplicate) {
+      throw new Error(
+        `Address already exists: ${this.line1} ${this.line2}, ${this.locality} ${this.postalCode} ${this.administrativeArea} ${this.countryCode}`,
+      );
+    }
+  }
+
+  // only one pickup and delivery address can be selected
+  @BeforeInsert()
+  @BeforeUpdate()
+  validateSelections() {
+    this.user.addresses.forEach((address) => {
+      if (this.id !== address.id) {
+        // pickup address
+        if (this.isSelectedPickup && address.isSelectedPickup) {
+          throw new Error(
+            `Pickup address already selected: ${address.line1} ${address.line2}, ${address.locality} ${address.postalCode} ${address.administrativeArea} ${address.countryCode}`,
+          );
+        }
+
+        // delivery address
+        if (this.isSelectedDelivery && address.isSelectedDelivery) {
+          throw new Error(
+            `Delivery address already selected: ${address.line1} ${address.line2}, ${address.locality} ${address.postalCode} ${address.administrativeArea} ${address.countryCode}`,
+          );
+        }
+      }
+    });
+  }
 }

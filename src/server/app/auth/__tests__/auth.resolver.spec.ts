@@ -21,6 +21,10 @@ import {
   registerSocialInputFactory,
   socialProfileFactory,
 } from 'test/factories/auth.factory';
+import { PaymentService } from '../../payments/payment.service';
+import { StripeModule } from '@golevelup/nestjs-stripe';
+import stripeConfig from 'src/server/config/stripe.config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 describe('AuthResolver', () => {
   let authResolver: AuthResolver;
@@ -28,13 +32,25 @@ describe('AuthResolver', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [JwtModule.register({ secret: 'secret' })],
+      imports: [
+        JwtModule.register({ secret: 'secret' }),
+        ConfigModule.forFeature(stripeConfig),
+        StripeModule.forRootAsync(StripeModule, {
+          imports: [ConfigModule],
+          useFactory: async (configService: ConfigService) => ({
+            apiKey: configService.get('stripe.apiKey'),
+            apiVersion: configService.get('stripe.apiVersion'),
+          }),
+          inject: [ConfigService],
+        }),
+      ],
       providers: [
         AuthResolver,
         AuthService,
         UserService,
         UserRepository,
         SocialProviderRepository,
+        PaymentService,
       ],
     }).compile();
 

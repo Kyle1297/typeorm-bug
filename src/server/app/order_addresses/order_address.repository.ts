@@ -1,5 +1,6 @@
-import validateEntity from 'src/server/common/utils/validateEntity';
+import { validateEntity } from 'src/server/common/utils/validateEntity';
 import { EntityRepository, Repository } from 'typeorm';
+import { UpdateOrderAddressInput } from './input/update_order_address.input';
 import { OrderAddress } from './order_address.entity';
 
 @EntityRepository(OrderAddress)
@@ -16,7 +17,7 @@ export class OrderAddressRepository extends Repository<OrderAddress> {
 
   async updateOne(
     id: string,
-    orderAddressData: Partial<OrderAddress>,
+    orderAddressData: UpdateOrderAddressInput,
   ): Promise<OrderAddress> {
     const orderAddress = await this.findOneOrError(id);
 

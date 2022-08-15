@@ -5,7 +5,7 @@ import { UserAddress } from './user_address.entity';
 export class UserAddressRepository extends Repository<UserAddress> {
   async findOneOrError(id: string): Promise<UserAddress> {
     const userAddress = await this.findOne(id, {
-      relations: ['user'],
+      relations: ['user', 'user.addresses'],
     });
 
     if (!userAddress) {

@@ -11,27 +11,25 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, HideField, ObjectType } from '@nestjs/graphql';
 import { IsDate, IsOptional, MaxLength, Min } from 'class-validator';
 import {
   OrderStatuses,
   OrderStatusScalar,
 } from './scalars/order_status.scalar';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
-import orderId from 'order-id';
 import {
   OrderTimeslots,
   OrderTimeslotScalar,
 } from './scalars/order_timeslot.scalar';
-import { IsISO4217 } from 'src/server/common/decorators/IsISO4217';
+import { isISO4217 } from 'src/server/common/decorators/IsISO4217';
 import { ProductVersion } from '../product_versions/product_version.entity';
 import { User } from '../users/user.entity';
 import { Washer } from '../washers/washer.entity';
 import { OrderImage } from '../order_images/order_image.entity';
 import { OrderAddress } from '../order_addresses/order_address.entity';
 import { ProductFeatureOptionVersion } from '../product_feature_option_versions/product_feature_option_version.entity';
-
-const ORDER_ID_SEED_PHRASE = 'order-id-seed-phrase';
+import { orderNumber } from './utils/orderNumber';
 
 @ObjectType()
 @Entity()
@@ -41,9 +39,12 @@ export class Order extends BaseEntity {
   orderNumber: string;
 
   @Field()
-  @IsISO4217()
   @Column({ nullable: false })
   currencyCode: string;
+
+  @HideField()
+  @Column({ nullable: true })
+  stripePaymentIntentId?: string;
 
   @Field()
   @Min(1)
@@ -133,6 +134,31 @@ export class Order extends BaseEntity {
   @Column('text', { nullable: false, default: '' })
   washerNotesOnDelivery: string;
 
+  @Field()
+  @Column('integer', { nullable: false, default: 0 })
+  @Min(0)
+  additionalChargesInCents: number;
+
+  @Field()
+  @MaxLength(1200)
+  @Column('text', { nullable: false, default: '' })
+  additionalChargeReason: string;
+
+  @Field()
+  @Column({ nullable: false, default: false })
+  isCancelled: boolean;
+
+  @Field()
+  @MaxLength(1200)
+  @Column('text', { nullable: false, default: '' })
+  cancellationReason: string;
+
+  @Field({ nullable: true })
+  @IsDate()
+  @IsOptional()
+  @Column({ nullable: true })
+  cancelledAt?: Date;
+
   @Field((_type) => OrderAddress)
   @OneToOne((_type) => OrderAddress, {
     cascade: true,
@@ -170,23 +196,12 @@ export class Order extends BaseEntity {
   })
   washer?: Washer;
 
-  @Field((_type) => [OrderImage], { nullable: true })
+  @Field((_type) => [OrderImage])
   @OneToMany((_type) => OrderImage, (orderImage) => orderImage.order, {
-    nullable: true,
+    nullable: false,
+    cascade: true,
   })
-  pickupImages?: OrderImage[];
-
-  @Field((_type) => [OrderImage], { nullable: true })
-  @OneToMany((_type) => OrderImage, (orderImage) => orderImage.order, {
-    nullable: true,
-  })
-  readyForDeliveryImages?: OrderImage[];
-
-  @Field((_type) => [OrderImage], { nullable: true })
-  @OneToMany((_type) => OrderImage, (orderImage) => orderImage.order, {
-    nullable: true,
-  })
-  deliveryImages?: OrderImage[];
+  images: OrderImage[];
 
   @Field((_type) => [ProductFeatureOptionVersion])
   @ManyToMany(
@@ -200,34 +215,37 @@ export class Order extends BaseEntity {
   @JoinTable()
   preferences: ProductFeatureOptionVersion[];
 
-  @Field()
-  @Column('integer', { nullable: false, default: 0 })
-  @Min(0)
-  additionalChargesInCents: number;
-
-  @Field()
-  @MaxLength(1200)
-  @Column('text', { nullable: false, default: '' })
-  additionalChargeReason: string;
-
-  @Field()
-  @Column({ nullable: false, default: false })
-  isCancelled: boolean;
-
-  @Field()
-  @MaxLength(1200)
-  @Column('text', { nullable: false, default: '' })
-  cancellationReason: string;
-
-  @Field({ nullable: true })
-  @IsDate()
-  @IsOptional()
-  @Column({ nullable: true })
-  cancelledAt?: Date;
-
   @BeforeInsert()
   setOrderNumber() {
-    this.orderNumber = orderId(ORDER_ID_SEED_PHRASE).generate();
+    this.orderNumber = orderNumber().generate();
+  }
+
+  @Field((_type) => [OrderImage])
+  pickupImages: OrderImage[];
+
+  @Field((_type) => [OrderImage])
+  readyForDeliveryImages: OrderImage[];
+
+  @Field((_type) => [OrderImage])
+  deliveryImages: OrderImage[];
+
+  @AfterLoad()
+  fetchImages() {
+    if (this.images) {
+      const pickupImages: OrderImage[] = [];
+      const readyForDeliveryImages: OrderImage[] = [];
+      const deliveryImages: OrderImage[] = [];
+
+      this.images.forEach((image) => {
+        if (image.type === 'PICKUP') pickupImages.push(image);
+        else if (image.type === 'DELIVERY') deliveryImages.push(image);
+        else readyForDeliveryImages.push(image);
+      });
+
+      this.pickupImages = pickupImages;
+      this.readyForDeliveryImages = readyForDeliveryImages;
+      this.deliveryImages = deliveryImages;
+    }
   }
 
   private previousIsCancelled: boolean;
@@ -296,6 +314,14 @@ export class Order extends BaseEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
+  validateCurrencyCode() {
+    if (this.currencyCode && !isISO4217(this.currencyCode)) {
+      throw new Error(`Invalid currency code: ${this.currencyCode}`);
+    }
+  }
+
+  @BeforeInsert()
+  @BeforeUpdate()
   validateCancellation() {
     if (this.isCancelled && (!this.cancellationReason || !this.cancelledAt)) {
       throw new Error(
@@ -306,6 +332,15 @@ export class Order extends BaseEntity {
     if (!this.isCancelled && (this.cancellationReason || this.cancelledAt)) {
       throw new Error(
         'Cancellation reason and cancelled at date should not be set if order has not been cancelled',
+      );
+    }
+
+    if (
+      (this.isCancelled || this.cancellationReason || this.cancelledAt) &&
+      this.status === 'DELIVERED'
+    ) {
+      throw new Error(
+        'Cancellation reason and cancelled at date should not be set if order has been delivered',
       );
     }
   }
@@ -375,19 +410,9 @@ export class Order extends BaseEntity {
           'Order cannot have notes on delivery if it has not been confirmed',
         );
       }
-      if (this.pickupImages) {
+      if (this.images.length > 0) {
         throw new Error(
-          'Order cannot have pickup images if it has not been confirmed',
-        );
-      }
-      if (this.readyForDeliveryImages) {
-        throw new Error(
-          'Order cannot have ready for delivery images if it has not been confirmed',
-        );
-      }
-      if (this.deliveryImages) {
-        throw new Error(
-          'Order cannot have delivery images if it has not been confirmed',
+          'Order cannot have images if it has not been confirmed',
         );
       }
       if (this.additionalChargesInCents > 0) {
@@ -464,19 +489,9 @@ export class Order extends BaseEntity {
           'Order cannot have notes on delivery if it has only been confirmed',
         );
       }
-      if (this.pickupImages) {
+      if (this.images.length > 0) {
         throw new Error(
-          'Order cannot have pickup images if it has only been confirmed',
-        );
-      }
-      if (this.readyForDeliveryImages) {
-        throw new Error(
-          'Order cannot have ready for delivery images if it has only been confirmed',
-        );
-      }
-      if (this.deliveryImages) {
-        throw new Error(
-          'Order cannot have delivery images if it has only been confirmed',
+          'Order cannot have images if it has only been confirmed',
         );
       }
       if (!this.currencyCode) {
@@ -554,19 +569,9 @@ export class Order extends BaseEntity {
           "Order cannot have notes on delivery if it's washer has only been assigned",
         );
       }
-      if (this.pickupImages) {
+      if (this.images.length > 0) {
         throw new Error(
-          "Order cannot have pickup images if it's washer has only been assigned",
-        );
-      }
-      if (this.readyForDeliveryImages) {
-        throw new Error(
-          "Order cannot have ready for delivery images if it's washer has only been assigned",
-        );
-      }
-      if (this.deliveryImages) {
-        throw new Error(
-          "Order cannot have delivery images if it's washer has only been assigned",
+          "Order cannot have images if it's washer has only been assigned",
         );
       }
       if (!this.currencyCode) {
@@ -639,16 +644,6 @@ export class Order extends BaseEntity {
           'Order cannot have notes on delivery if it has only been picked up',
         );
       }
-      if (this.readyForDeliveryImages) {
-        throw new Error(
-          'Order cannot have ready for delivery images if it has only been picked up',
-        );
-      }
-      if (this.deliveryImages) {
-        throw new Error(
-          'Order cannot have delivery images if it has only been picked up',
-        );
-      }
       if (!this.currencyCode) {
         throw new Error(
           'Order must have a currency code if it has been picked up',
@@ -719,16 +714,6 @@ export class Order extends BaseEntity {
           'Order cannot have notes on delivery if it is ready for delivery',
         );
       }
-      if (!this.readyForDeliveryImages) {
-        throw new Error(
-          'Order must have ready for delivery images if it is ready for delivery',
-        );
-      }
-      if (this.deliveryImages) {
-        throw new Error(
-          'Order cannot have delivery images if it is ready for delivery',
-        );
-      }
       if (!this.currencyCode) {
         throw new Error(
           'Order must have a currency code if it is ready for delivery',
@@ -789,16 +774,6 @@ export class Order extends BaseEntity {
       if (this.washerNotesOnDelivery) {
         throw new Error(
           'Order cannot have notes on delivery if it is on the way',
-        );
-      }
-      if (!this.readyForDeliveryImages) {
-        throw new Error(
-          'Order must have ready for delivery images if it is on the way',
-        );
-      }
-      if (this.deliveryImages) {
-        throw new Error(
-          'Order cannot have delivery images if it is on the way',
         );
       }
       if (!this.currencyCode) {
@@ -862,11 +837,6 @@ export class Order extends BaseEntity {
       if (!this.deliverBetween) {
         throw new Error(
           'Order must have a delivery time if it has been delivered',
-        );
-      }
-      if (!this.readyForDeliveryImages) {
-        throw new Error(
-          'Order must have ready for delivery images if it has been delivered',
         );
       }
       if (!this.currencyCode) {

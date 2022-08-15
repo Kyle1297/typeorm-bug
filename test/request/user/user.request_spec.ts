@@ -4,6 +4,7 @@ import { gql } from 'apollo-server-express';
 import { GQL } from '../constants';
 import { authHeaderFactory } from '../../factories/auth.factory';
 import { E2EApp, initializeApp } from '../test_utils/initialize_app';
+import * as faker from 'faker';
 import {
   UpdateUserNameInput,
   UpdateUserPhoneInput,
@@ -21,10 +22,10 @@ describe('UserModule (e2e)', () => {
     await e2e.cleanup();
   });
 
-  describe('currentUser query', () => {
+  describe('user query', () => {
     const query = gql`
-      query currentUser {
-        currentUser {
+      query user {
+        user {
           id
           email
           firstName
@@ -41,10 +42,17 @@ describe('UserModule (e2e)', () => {
     `.loc?.source.body;
 
     it('should return current user', async () => {
-      const user = await e2e.dbTestUtils.saveOne(userFactory.buildOne());
+      let user = await e2e.dbTestUtils.saveOne(userFactory.buildOne());
       const address = await e2e.dbTestUtils.saveOne(
         userAddressFactory.buildOne({
+          type: 'PICKUP_AND_DELIVERY',
           user,
+        }),
+      );
+      user = await e2e.dbTestUtils.saveOne(
+        userFactory.buildOne({
+          ...user,
+          addresses: [address],
         }),
       );
 
@@ -58,18 +66,18 @@ describe('UserModule (e2e)', () => {
         .set('Authorization', authHeaderFactory(user))
         .expect(200);
 
-      expect(result.body.data.currentUser.email).toBe(user.email);
-      expect(result.body.data.currentUser.firstName).toBe(user.firstName);
-      expect(result.body.data.currentUser.lastName).toBe(user.lastName);
-      expect(result.body.data.currentUser.phoneCountryCode).toBe(
+      expect(result.body.data.user.email).toBe(user.email);
+      expect(result.body.data.user.firstName).toBe(user.firstName);
+      expect(result.body.data.user.lastName).toBe(user.lastName);
+      expect(result.body.data.user.phoneCountryCode).toBe(
         user.phoneCountryCode,
       );
-      expect(result.body.data.currentUser.phoneNumber).toBe(user.phoneNumber);
-      expect(result.body.data.currentUser.addresses[0].id).toBe(address.id);
-      expect(result.body.data.currentUser.createdAt).toBe(
+      expect(result.body.data.user.phoneNumber).toBe(user.phoneNumber);
+      expect(result.body.data.user.addresses[0].id).toBe(address.id);
+      expect(result.body.data.user.createdAt).toBe(
         user.createdAt.toISOString(),
       );
-      expect(result.body.data.currentUser.updatedAt).toBe(
+      expect(result.body.data.user.updatedAt).toBe(
         user.updatedAt.toISOString(),
       );
     });
@@ -89,50 +97,10 @@ describe('UserModule (e2e)', () => {
     });
   });
 
-  describe('removeCurrentUser mutation', () => {
+  describe('updateUserName mutation', () => {
     const query = gql`
-      mutation removeCurrentUser {
-        removeCurrentUser {
-          email
-        }
-      }
-    `.loc?.source.body;
-
-    it('should remove current user, and return removed user', async () => {
-      const user = await e2e.dbTestUtils.saveOne(userFactory.buildOne());
-
-      const gqlReq = {
-        query,
-      };
-
-      const result = await request(e2e.app.getHttpServer())
-        .post(GQL)
-        .send(gqlReq)
-        .set('Authorization', authHeaderFactory(user))
-        .expect(200);
-
-      expect(result.body.data.removeCurrentUser.email).toBe(user.email);
-    });
-
-    it('should reject if user is not authenticated', async () => {
-      const gqlReg = {
-        query,
-      };
-
-      const result = await request(e2e.app.getHttpServer())
-        .post(GQL)
-        .send(gqlReg)
-        .expect(200);
-
-      expect(result.body.errors).toHaveLength(1);
-      expect(result.body.errors[0].message).toBe('Unauthorized');
-    });
-  });
-
-  describe('updateCurrentUserName mutation', () => {
-    const query = gql`
-      mutation updateCurrentUserName($input: UpdateUserNameInput!) {
-        updateCurrentUserName(input: $input) {
+      mutation updateUserName($input: UpdateUserNameInput!) {
+        updateUserName(input: $input) {
           id
           firstName
           lastName
@@ -159,9 +127,9 @@ describe('UserModule (e2e)', () => {
         .set('Authorization', authHeaderFactory(user))
         .expect(200);
 
-      expect(result.body.data.updateCurrentUserName.id).toBe(user.id);
-      expect(result.body.data.updateCurrentUserName.firstName).toBe('John');
-      expect(result.body.data.updateCurrentUserName.lastName).toBe('Doe');
+      expect(result.body.data.updateUserName.id).toBe(user.id);
+      expect(result.body.data.updateUserName.firstName).toBe('John');
+      expect(result.body.data.updateUserName.lastName).toBe('Doe');
     });
 
     it('should reject if user is not authenticated', async () => {
@@ -210,10 +178,10 @@ describe('UserModule (e2e)', () => {
     });
   });
 
-  describe('updateCurrentUserPhone mutation', () => {
+  describe('updateUserPhone mutation', () => {
     const query = gql`
-      mutation updateCurrentUserPhone($input: UpdateUserPhoneInput!) {
-        updateCurrentUserPhone(input: $input) {
+      mutation updateUserPhone($input: UpdateUserPhoneInput!) {
+        updateUserPhone(input: $input) {
           id
           phoneCountryCode
           phoneNumber
@@ -240,13 +208,9 @@ describe('UserModule (e2e)', () => {
         .set('Authorization', authHeaderFactory(user))
         .expect(200);
 
-      expect(result.body.data.updateCurrentUserPhone.id).toBe(user.id);
-      expect(result.body.data.updateCurrentUserPhone.phoneCountryCode).toBe(
-        'AU',
-      );
-      expect(result.body.data.updateCurrentUserPhone.phoneNumber).toBe(
-        '+61412345678',
-      );
+      expect(result.body.data.updateUserPhone.id).toBe(user.id);
+      expect(result.body.data.updateUserPhone.phoneCountryCode).toBe('AU');
+      expect(result.body.data.updateUserPhone.phoneNumber).toBe('+61412345678');
     });
 
     it('should reject if user is not authenticated', async () => {
@@ -292,6 +256,48 @@ describe('UserModule (e2e)', () => {
       expect(result.body.errors[0].message).toBe(
         'phoneCountryCode must be a valid ISO31661 Alpha2 code, phoneNumber must be a valid phone number',
       );
+    });
+  });
+
+  describe('userExists query', () => {
+    const query = gql`
+      query userExists($email: String!) {
+        userExists(email: $email)
+      }
+    `.loc?.source.body;
+
+    it('should return true if user exists', async () => {
+      const user = await e2e.dbTestUtils.saveOne(userFactory.buildOne());
+
+      const gqlReq = {
+        query,
+        variables: {
+          email: user.email,
+        },
+      };
+
+      const result = await request(e2e.app.getHttpServer())
+        .post(GQL)
+        .send(gqlReq)
+        .expect(200);
+
+      expect(result.body.data.userExists).toBe(true);
+    });
+
+    it('should return false if user does not exist', async () => {
+      const gqlReq = {
+        query,
+        variables: {
+          email: faker.internet.email(),
+        },
+      };
+
+      const result = await request(e2e.app.getHttpServer())
+        .post(GQL)
+        .send(gqlReq)
+        .expect(200);
+
+      expect(result.body.data.userExists).toBe(false);
     });
   });
 });

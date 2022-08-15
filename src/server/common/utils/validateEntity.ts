@@ -1,6 +1,6 @@
 import { validate } from 'class-validator';
 
-const validateEntity = async (entity: any): Promise<Error | void> => {
+export const validateEntity = async (entity: any): Promise<Error | void> => {
   const errors = await validate(entity);
   if (errors.length > 0) {
     throw new Error(
@@ -12,5 +12,3 @@ const validateEntity = async (entity: any): Promise<Error | void> => {
     );
   }
 };
-
-export default validateEntity;

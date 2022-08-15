@@ -1,4 +1,11 @@
-import { BeforeInsert, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Min } from 'class-validator';
 import { BaseEntity } from 'src/server/common/entities/base.entity';
@@ -12,6 +19,7 @@ import { ColumnEmbeddedOptions } from 'typeorm/decorator/options/ColumnEmbeddedO
 export class ProductVersion extends BaseEntity {
   @Field()
   @Min(1)
+  @Index()
   @Column(
     'integer' as unknown as (type?: any) => () => any,
     {
@@ -51,7 +59,7 @@ export class ProductVersion extends BaseEntity {
           ? currentVersionNumber
           : latestVersionNumber;
       },
-      0,
+      1,
     );
   }
 }

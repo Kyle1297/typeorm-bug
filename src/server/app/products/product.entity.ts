@@ -1,4 +1,5 @@
 import {
+  AfterLoad,
   Column,
   Entity,
   JoinColumn,
@@ -41,7 +42,7 @@ export class Product extends BaseEntity {
   @JoinTable()
   features: ProductFeature[];
 
-  @Field((_type) => ProductVersion)
+  @Field((_type) => [ProductVersion])
   @OneToMany(
     (_type) => ProductVersion,
     (productVersion) => productVersion.product,
@@ -51,5 +52,20 @@ export class Product extends BaseEntity {
   )
   versions: ProductVersion[];
 
+  @Field((_type) => ProductVersion)
   latestVersion: ProductVersion;
+
+  @AfterLoad()
+  fetchLatestVersionAndPrice() {
+    if (this.versions) {
+      this.latestVersion = this.versions.reduce(
+        (latestVersion, currentVersion) => {
+          return currentVersion.versionNumber > latestVersion.versionNumber
+            ? currentVersion
+            : latestVersion;
+        },
+        this.versions[0],
+      );
+    }
+  }
 }

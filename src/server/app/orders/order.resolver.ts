@@ -5,7 +5,6 @@ import { JwtGqlAuthGuard } from 'src/server/common/guards/jwt_gql_auth.guard';
 import { Input } from '../graphql/args/input.args';
 import { User } from '../users/user.entity';
 import { CreateUnconfirmedOrderInput } from './input/create_unconfirmed_order.input';
-import { UpdateOrderAddressesInput } from './input/update_order_addresses.input';
 import { UpdateOrderDetailsInput } from './input/update_order_details.input';
 import { UpdateOrderScheduleInput } from './input/update_order_schedule.input';
 import { Order } from './order.entity';
@@ -54,9 +53,8 @@ export class OrderResolver {
   async updateOrderAddresses(
     @GqlUser() user: User,
     @Args({ name: 'id', type: () => ID }) id: string,
-    @Input() input: UpdateOrderAddressesInput,
   ): Promise<Order> {
-    return this.orderService.updateAddresses(id, input, user);
+    return this.orderService.updateAddresses(id, user);
   }
 
   @UseGuards(JwtGqlAuthGuard)

@@ -14,20 +14,36 @@ import {
   registerSocialInputFactory,
   socialProfileFactory,
 } from 'test/factories/auth.factory';
+import { PaymentService } from '../../payments/payment.service';
+import stripeConfig from 'src/server/config/stripe.config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { StripeModule } from '@golevelup/nestjs-stripe';
 
-describe.only('AuthService', () => {
+describe('AuthService', () => {
   let authService: AuthService;
   let userService: UserService;
   let socialProviderRepository: SocialProviderRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [JwtModule.register({ secret: 'secret' })],
+      imports: [
+        JwtModule.register({ secret: 'secret' }),
+        ConfigModule.forFeature(stripeConfig),
+        StripeModule.forRootAsync(StripeModule, {
+          imports: [ConfigModule],
+          useFactory: async (configService: ConfigService) => ({
+            apiKey: configService.get('stripe.apiKey'),
+            apiVersion: configService.get('stripe.apiVersion'),
+          }),
+          inject: [ConfigService],
+        }),
+      ],
       providers: [
         AuthService,
         UserService,
         UserRepository,
         SocialProviderRepository,
+        PaymentService,
       ],
     }).compile();
 
@@ -82,7 +98,7 @@ describe.only('AuthService', () => {
       jest
         .spyOn(userService, 'existsByCredentials')
         .mockResolvedValueOnce(false);
-      jest.spyOn(userService, 'save').mockResolvedValueOnce(user);
+      jest.spyOn(userService, 'create').mockResolvedValueOnce(user);
 
       const response = await authService.registerUser(registerUserInput);
 

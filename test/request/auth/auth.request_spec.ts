@@ -28,6 +28,8 @@ import {
 import { LoginSocialInput } from 'src/server/app/auth/inputs/login_social.input';
 import { RegisterSocialInput } from 'src/server/app/auth/inputs/register_social.input';
 import { ErrorResponse } from 'src/server/app/graphql/interfaces/error_response.interface';
+import { RegisterUserInput } from 'src/server/app/auth/inputs/register_user.input';
+import { LoginUserInput } from 'src/server/app/auth/inputs/login_user.input';
 
 describe('AuthModule (e2e)', () => {
   let e2e: E2EApp;
@@ -138,6 +140,7 @@ describe('AuthModule (e2e)', () => {
               lastName
               phoneCountryCode
               phoneNumber
+              currencyCode
             }
             token
           }
@@ -178,6 +181,7 @@ describe('AuthModule (e2e)', () => {
         registerUserInput.phoneCountryCode,
       );
       expect(response.user.phoneNumber).toBe(registerUserInput.phoneNumber);
+      expect(response.user.currencyCode).toBe('AUD');
       expect(response.token).toBeTruthy();
     });
 

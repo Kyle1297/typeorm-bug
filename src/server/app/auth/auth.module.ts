@@ -13,6 +13,7 @@ import jwtConfig from 'src/server/config/jwt.config';
 import googleConfig from 'src/server/config/google.config';
 import facebookConfig from 'src/server/config/facebook.config';
 import { UserModule } from '../users/user.module';
+import { PaymentModule } from '../payments/payment.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { UserModule } from '../users/user.module';
       inject: [ConfigService],
     }),
     UserModule,
+    PaymentModule,
   ],
   providers: [
     AuthResolver,
