@@ -1,8 +1,8 @@
 {
-  "name": "foldify-web",
+  "name": "typeorm-bug",
   "private": true,
   "version": "1.0.0",
-  "description": "Nest TypeScript starter repository",
+  "description": "Typeorm CLI bug",
   "license": "MIT",
   "scripts": {
     "typeorm": "typeorm-ts-node-commonjs",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "pg": "^8.4.0",
-    "typeorm": "0.3.8",
+    "typeorm": "0.3.4",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
